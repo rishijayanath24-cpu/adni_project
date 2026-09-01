@@ -1,3 +1,6 @@
+# R data files (ADNI ships as .rda, not .csv)
+pyreadr>=0.5
+
 # Core
 pandas>=2.2
 numpy>=1.26

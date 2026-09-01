@@ -15,8 +15,6 @@ import pandas as pd
 VISITS = ["bl", "m06", "m12", "m18", "m24", "m36"]
 VISIT_MONTHS = {"bl": 0, "m06": 6, "m12": 12, "m18": 18, "m24": 24, "m36": 36}
 
-DX_BL_MCI_CODES = ("EMCI", "LMCI")
-
 # ADNI is documented to oversample White, non-Hispanic participants relative
 # to the US population -- mirrored here so downstream fairness-audit code has
 # a realistically imbalanced subgroup distribution to contend with.
@@ -44,17 +42,13 @@ def generate_mock_adnimerge(n_subjects: int = 1500, seed: int = 0) -> pd.DataFra
         race = rng.choice(RACE_CATEGORIES, p=RACE_PROBS)
         ethnicity = rng.choice(ETH_CATEGORIES, p=ETH_PROBS)
         apoe4 = int(rng.choice([0, 1, 2], p=[0.55, 0.35, 0.10]))
-        dx_bl = rng.choice(DX_BL_MCI_CODES, p=[0.55, 0.45])
         colprot = rng.choice(["ADNI1", "ADNIGO", "ADNI2", "ADNI3"], p=[0.30, 0.10, 0.35, 0.25])
         field_strength = "1.5T" if (colprot == "ADNI1" and rng.random() < 0.8) else "3T"
 
         # Latent conversion-risk score -- synthetic, not epidemiologically calibrated.
-        risk = (
-            0.03 * (age_bl - 70)
-            + 0.5 * apoe4
-            + (0.4 if dx_bl == "LMCI" else 0.0)
-            + rng.normal(0, 0.6)
-        )
+        # Real ADNI's DIAGNOSIS field carries only {CN, MCI, Dementia}, no
+        # EMCI/LMCI subtype, so risk isn't modulated by one here either.
+        risk = 0.03 * (age_bl - 70) + 0.5 * apoe4 + rng.normal(0, 0.6)
 
         # Modality availability is fixed per subject across their visits, mirroring
         # how ADNI sub-study enrollment behaves in practice (mostly all-or-nothing).
@@ -85,9 +79,15 @@ def generate_mock_adnimerge(n_subjects: int = 1500, seed: int = 0) -> pd.DataFra
 
             hippocampus = rng.normal(6800 - 15 * month - 200 * apoe4, 700) if has_mri else np.nan
             fdg = rng.normal(1.25 - 0.002 * month - 0.05 * apoe4, 0.12) if (has_pet and rng.random() < 0.95) else np.nan
-            av45 = rng.normal(1.1 + 0.15 * apoe4 + 0.002 * month, 0.2) if (has_pet and rng.random() < 0.85) else np.nan
-            abeta = rng.normal(900 - 120 * apoe4, 200) if (has_csf and rng.random() < 0.9) else np.nan
-            ptau = rng.normal(25 + 8 * apoe4, 10) if (has_csf and rng.random() < 0.9) else np.nan
+            amyloid_suvr = (
+                rng.normal(1.1 + 0.15 * apoe4 + 0.002 * month, 0.2) if (has_pet and rng.random() < 0.85) else np.nan
+            )
+            amyloid_status = amyloid_suvr > 1.11 if not np.isnan(amyloid_suvr) else np.nan  # conventional AV45 cutoff
+            tau_suvr = (
+                rng.normal(1.2 + 0.1 * apoe4 + 0.003 * month, 0.15) if (has_pet and rng.random() < 0.6) else np.nan
+            )
+            csf_abeta = rng.normal(900 - 120 * apoe4, 200) if (has_csf and rng.random() < 0.9) else np.nan
+            csf_ptau = rng.normal(25 + 8 * apoe4, 10) if (has_csf and rng.random() < 0.9) else np.nan
 
             rows.append(
                 dict(
@@ -102,15 +102,16 @@ def generate_mock_adnimerge(n_subjects: int = 1500, seed: int = 0) -> pd.DataFra
                     PTRACCAT=race,
                     PTETHCAT=ethnicity,
                     APOE4=apoe4,
-                    DX_bl=dx_bl,
                     DX=dx,
                     MMSE=round(mmse, 1),
                     CDRSB=round(cdrsb, 1),
                     Hippocampus=None if np.isnan(hippocampus) else round(float(hippocampus), 1),
                     FDG=None if np.isnan(fdg) else round(float(fdg), 3),
-                    AV45=None if np.isnan(av45) else round(float(av45), 3),
-                    ABETA=None if np.isnan(abeta) else round(float(abeta), 1),
-                    PTAU=None if np.isnan(ptau) else round(float(ptau), 2),
+                    AMYLOID_SUVR=None if np.isnan(amyloid_suvr) else round(float(amyloid_suvr), 3),
+                    AMYLOID_STATUS=None if pd.isna(amyloid_status) else bool(amyloid_status),
+                    TAU_SUVR=None if np.isnan(tau_suvr) else round(float(tau_suvr), 3),
+                    CSF_ABETA=None if np.isnan(csf_abeta) else round(float(csf_abeta), 1),
+                    CSF_PTAU=None if np.isnan(csf_ptau) else round(float(csf_ptau), 2),
                 )
             )
 

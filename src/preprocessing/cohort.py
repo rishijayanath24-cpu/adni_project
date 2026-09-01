@@ -44,11 +44,13 @@ def _subject_label(visits: pd.DataFrame, horizon: int) -> tuple[float, bool]:
 def build_cohort(subject_visits: pd.DataFrame) -> pd.DataFrame:
     """Build the baseline-feature + horizon-label cohort table from subject-visit rows.
 
-    Inclusion: DX_bl in {EMCI, LMCI} (i.e. MCI at baseline) with a recorded
-    baseline ('bl') visit.
+    Inclusion: DX == "MCI" at a recorded baseline ('bl') visit. ADNI's own
+    DIAGNOSIS field carries only {CN, MCI, Dementia} -- the older EMCI/LMCI
+    subtype split lives in DXSUM's free-text DXMDES field, not DIAGNOSIS,
+    and is not required for this project's inclusion criterion.
     """
     baseline = subject_visits[subject_visits["VISCODE"] == "bl"].set_index("RID")
-    baseline = baseline[baseline["DX_bl"].isin(["EMCI", "LMCI"])]
+    baseline = baseline[baseline["DX"] == "MCI"]
 
     records = []
     for rid, base_row in baseline.iterrows():
@@ -63,17 +65,18 @@ def build_cohort(subject_visits: pd.DataFrame) -> pd.DataFrame:
             "PTRACCAT": base_row["PTRACCAT"],
             "PTETHCAT": base_row["PTETHCAT"],
             "APOE4": base_row["APOE4"],
-            "DX_bl": base_row["DX_bl"],
             "MMSE_bl": base_row["MMSE"],
             "CDRSB_bl": base_row["CDRSB"],
             "Hippocampus_bl": base_row["Hippocampus"],
             "FDG_bl": base_row["FDG"],
-            "AV45_bl": base_row["AV45"],
-            "ABETA_bl": base_row["ABETA"],
-            "PTAU_bl": base_row["PTAU"],
+            "AMYLOID_SUVR_bl": base_row["AMYLOID_SUVR"],
+            "AMYLOID_STATUS_bl": base_row.get("AMYLOID_STATUS"),
+            "TAU_SUVR_bl": base_row.get("TAU_SUVR"),
+            "CSF_ABETA_bl": base_row["CSF_ABETA"],
+            "CSF_PTAU_bl": base_row["CSF_PTAU"],
             "HAS_MRI_bl": pd.notna(base_row["Hippocampus"]),
-            "HAS_PET_bl": pd.notna(base_row["FDG"]) or pd.notna(base_row["AV45"]),
-            "HAS_CSF_bl": pd.notna(base_row["ABETA"]) or pd.notna(base_row["PTAU"]),
+            "HAS_PET_bl": pd.notna(base_row["FDG"]) or pd.notna(base_row["AMYLOID_SUVR"]),
+            "HAS_CSF_bl": pd.notna(base_row["CSF_ABETA"]) or pd.notna(base_row["CSF_PTAU"]),
             "N_VISITS": len(subj_visits),
             "LAST_MONTH_SEEN": subj_visits["Month"].max(),
         }
