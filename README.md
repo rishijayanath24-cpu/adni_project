@@ -41,15 +41,15 @@ Uses **ADNIMERGE only** (16,378 subject-visit rows, 115 variables — cognition,
 - Report fairness metrics (equalized odds, equal opportunity, demographic parity) for every model, including the three re-implemented baselines.
 
 ## Milestones
-1. ADNI data-use access request submitted (scope: ADNIMERGE + supplementary tables, not raw imaging archive).
-2. Cohort construction + leakage-safe subject-level split.
-3. Re-implement and validate UMoS, ProMUSE, DQN-2025 against their published numbers.
-4. Fairness audit of all three baselines' acquisition behavior.
-5. Horizon-conditioned acquisition policy + audit.
-6. Fairness-constrained policy variant.
-7. Full evaluation: cost-accuracy Pareto frontiers, calibration, fairness tables, horizon-behavior analysis.
-8. Re-run the systematic literature search (see full protocol in the project review artifact) before finalizing the novelty claim in the manuscript.
-9. Write-up.
+1. ⬜ ADNI data-use access request submitted (scope: ADNIMERGE + supplementary tables, not raw imaging archive).
+2. ✅ Cohort construction + leakage-safe subject-level split — implemented in `src/preprocessing/` (`cohort.py`, `splits.py`, `leakage_checks.py`) and exercised end-to-end against a synthetic ADNIMERGE-shaped dataset (`mock_adnimerge.py`, `smoke_test.py`). All logic is real and ready to run; only the input data is fake. **Do not use `mock_adnimerge.py` output for anything but pipeline testing.**
+3. ⬜ Re-implement and validate UMoS, ProMUSE, DQN-2025 against their published numbers.
+4. ⬜ Fairness audit of all three baselines' acquisition behavior.
+5. ⬜ Horizon-conditioned acquisition policy + audit.
+6. ⬜ Fairness-constrained policy variant.
+7. ⬜ Full evaluation: cost-accuracy Pareto frontiers, calibration, fairness tables, horizon-behavior analysis.
+8. ⬜ Re-run the systematic literature search (see full protocol in the project review artifact) before finalizing the novelty claim in the manuscript.
+9. ⬜ Write-up.
 
 ## Known open risk
 The novelty check so far is web-search-based (WebSearch/WebFetch across arXiv, PubMed, Europe PMC), not a formal Scopus/Web of Science systematic search. Treat the novelty claim as "likely, not confirmed" until that search is actually run — protocol is ready, execution is not done yet.
