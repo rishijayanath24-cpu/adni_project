@@ -1,0 +1,20 @@
+# ADNI data is governed by a Data Use Agreement — never commit raw or processed patient data.
+data/raw/
+data/processed/
+*.csv
+*.nii
+*.nii.gz
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local tooling config
+.claude/

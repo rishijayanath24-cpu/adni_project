@@ -1,0 +1,23 @@
+# Core
+pandas>=2.2
+numpy>=1.26
+scipy>=1.12
+
+# Modeling
+scikit-learn>=1.4
+xgboost>=2.0
+torch>=2.2
+
+# Fairness metrics
+fairlearn>=0.10
+
+# Calibration / survival / stats
+lifelines>=0.28
+statsmodels>=0.14
+
+# Plotting
+matplotlib>=3.8
+seaborn>=0.13
+
+# Notebooks
+jupyter>=1.0
