@@ -19,7 +19,7 @@ Not a new fusion architecture. A **fairness and prediction-horizon audit** of th
 
 None of these three report (a) disparate acquisition/error rates by race, ethnicity, or sex, or (b) whether the optimal policy changes with the prediction horizon (12 vs. 24 vs. 36 months). This project re-implements all three as baselines, then adds both audits, plus a fairness-constrained and horizon-conditioned policy variant.
 
-**Do not claim "first to do sequential/cost-aware acquisition on ADNI."** That claim is false — see `docs/`. The claim is: first fairness + horizon audit of this specific line of work.
+**Do not claim "first to do sequential/cost-aware acquisition on ADNI."** That claim is false — the three papers above already do it. The claim is: first fairness + horizon audit of this specific line of work.
 
 ## Repo layout
 ```
@@ -38,7 +38,32 @@ paper/
 ```
 
 ## Data
-Uses **ADNIMERGE only** (16,378 subject-visit rows, 115 variables — cognition, MRI-derived volumes, PET SUVR, CSF biomarkers, APOE, diagnosis). No raw MRI/PET image preprocessing is required for the core result. Cross-reference `DXSUM`, `UCBERKELEY PET SUVR`, `UPENN CSF`, `APOERES` only if ADNIMERGE fields are ambiguous for a given subject-visit.
+Uses the **ADNIMERGE2 package's raw component tables** (217 `.rda` files),
+not a single pre-merged table — that package ships the source tables rather
+than one merged frame, which is preferable here since we get full raw fields.
+Read with `pyreadr` (no R install required). Tables actually used:
+
+| purpose | table |
+|---|---|
+| diagnosis over time | `DXSUM` |
+| demographics | `PTDEMOG` |
+| genotype | `APOERES` |
+| cognition | `MMSE`, `CDR` |
+| MRI volumes | `UCSFFSX7` + `UCSFFSX51`/`UCSFFSX6`/`UCSFFSX`/`UCSFFSX51_ADNI1_3T` |
+| FDG-PET | `UCBERKELEYFDG_8mm` (MetaROI) |
+| amyloid-PET | `UCBERKELEY_AMY_6MM` (`SUMMARY_SUVR`) |
+| tau-PET | `UCBERKELEY_TAU_6MM` (`META_TEMPORAL_SUVR`) |
+| CSF | `UPENNBIOMK_ROCHE_ELECSYS` |
+| plasma | `C2N_PRECIVITYAD2_PLASMA` |
+| scanner field strength | `MRIMETA` (1.5T) + `MRI3META` (3T) |
+
+No raw MRI/PET image preprocessing is required. FreeSurfer ROI codes were
+looked up in `DATADIC_01Sep2026.csv` and verified per table.
+
+**Visit codes:** all merges join on the harmonized `VISCODE2` (`bl`, `m06`,
+…), never raw `VISCODE`, which is protocol-specific and not comparable
+across phases. Screening visits coalesce into baseline where no true `bl`
+row exists, with a genuine `bl` row always winning.
 
 ## Non-negotiable rigor rules
 - **Subject-level train/val/test splits, enforced before any preprocessing statistic is computed.** This is the single largest source of inflated accuracy documented in this field (a 28-point swing in one directly-audited case).
