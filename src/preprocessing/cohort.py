@@ -59,6 +59,10 @@ def build_cohort(subject_visits: pd.DataFrame) -> pd.DataFrame:
             "RID": rid,
             "COLPROT": base_row["COLPROT"],
             "FIELD_STRENGTH": base_row["FIELD_STRENGTH"],
+            # FreeSurfer pipeline version behind the MRI volumes -- pooled across
+            # UCSFFSX* tables, so this belongs in the model as a covariate / in
+            # the paper as a reported confound, not silently mixed.
+            "FS_PIPELINE": base_row.get("FS_PIPELINE"),
             "AGE": base_row["AGE"],
             "PTGENDER": base_row["PTGENDER"],
             "PTEDUCAT": base_row["PTEDUCAT"],

@@ -71,7 +71,13 @@ def subject_level_split(
     stratification if a joint stratum is too small to split on.
     """
     rids = cohort[rid_col].to_numpy()
-    joint_strata = cohort[strata_col].astype(str) + "_" + cohort[label_col].astype(str)
+    # Missing stratum values become their own explicit "Unknown" stratum rather
+    # than NaN. NaN silently breaks sklearn's stratify and drops us to
+    # label-only splitting, quietly abandoning the scanner-stratification the
+    # project's rigor rules require -- an unknown scanner is itself a stratum
+    # worth balancing and reporting.
+    strata_vals = cohort[strata_col].fillna("Unknown").astype(str)
+    joint_strata = strata_vals + "_" + cohort[label_col].astype(str)
     label_only = cohort[label_col].astype(str)
 
     result = _stratified_split(rids, joint_strata, test_size, random_state)
@@ -81,7 +87,8 @@ def subject_level_split(
 
     remaining = cohort[cohort[rid_col].isin(train_val_rids)]
     rel_val_size = val_size / (1 - test_size)
-    remaining_joint = remaining[strata_col].astype(str) + "_" + remaining[label_col].astype(str)
+    remaining_strata = remaining[strata_col].fillna("Unknown").astype(str)
+    remaining_joint = remaining_strata + "_" + remaining[label_col].astype(str)
     remaining_label = remaining[label_col].astype(str)
 
     result = _stratified_split(remaining[rid_col].to_numpy(), remaining_joint, rel_val_size, random_state)

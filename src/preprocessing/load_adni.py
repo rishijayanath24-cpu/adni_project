@@ -6,8 +6,8 @@ cohort.py / splits.py / leakage_checks.py pipeline can run against it
 largely unchanged.
 
 FreeSurfer ROI codes (ST29SV, ST88SV, ST10CV, ST37SV, ST96SV) were looked
-up directly in data/raw/DATADIC_01Sep2026.csv (TBLNAME == "UCSFFSX51"),
-not guessed.
+up directly in data/raw/DATADIC_01Sep2026.csv (TBLNAME == "UCSFFSX51") and
+then verified present in every other UCSFFSX* table, not guessed.
 
 Visit-code handling (this was the first real bug found and fixed here):
 ADNI's plain VISCODE is protocol-specific and NOT comparable across phases
@@ -23,20 +23,17 @@ Known simplifications, flagged rather than hidden:
   join and will show up as missing rather than approximately matched.
 - Demographics/APOE are collapsed to one row per subject (first record by
   date) since they are collected once, not per visit.
-- **MRI coverage is currently understated and NOT yet trustworthy as a
-  real number.** load_mri_volumes() only reads UCSFFSX51, which is
-  confirmed (by direct check) to cover ADNI-GO/ADNI2 ONLY: cohort MRI
-  coverage is 100% for ADNIGO/ADNI2 subjects and exactly 0% for ADNI1,
-  ADNI3, and ADNI4 subjects, because each phase's scans were processed
-  under a different FreeSurfer pipeline version with its own table
-  (ADNI1 -> UCSFFSX or UCSFFSX51_ADNI1_3T, ADNI3 -> UCSFFSX6,
-  ADNI4 -> UCSFFSX7). HAS_MRI_bl / Hippocampus_bl in the current cohort
-  output reflect only the ADNIGO/ADNI2 subset until this is fixed.
-  NEXT STEP: merge in UCSFFSX, UCSFFSX6, UCSFFSX7 (their ROI column
-  coding needs re-checking against DATADIC per table -- do not assume
-  the same ST-codes carry over unchanged across FreeSurfer versions).
-  PET (UCBERKELEY_*) and CSF (UPENNBIOMK_MASTER) tables are each a single
-  table spanning all phases and do not have this problem.
+- MRI volumes are pooled across FreeSurfer pipeline-version tables
+  (UCSFFSX7 first, then UCSFFSX51 / UCSFFSX6 / UCSFFSX /
+  UCSFFSX51_ADNI1_3T for residual gaps), because each ADNI phase was
+  processed under a different version with its own table. The
+  FS_PIPELINE column records the source per subject-visit and SHOULD be
+  reported/adjusted for -- volumes from different FreeSurfer versions
+  are not perfectly interchangeable.
+- FreeSurfer rows flagged OVERALLQC == "Fail" are dropped; "Pass" is
+  deliberately NOT required, since OVERALLQC is unpopulated for most
+  UCSFFSX7 rows and requiring it would discard unlabeled-but-usable
+  scans. Sensitivity to a stricter QC rule is worth checking later.
 
 This module reads from data/raw/ only (gitignored) and must never write
 subject-level fields anywhere outside data/ -- see project README.
@@ -126,9 +123,21 @@ def _first_per_subject(df: pd.DataFrame, date_col: str | None = None) -> pd.Data
 
 
 def load_diagnosis() -> pd.DataFrame:
+    """Per-visit diagnosis (CN / MCI / Dementia) from DXSUM.
+
+    Screening is coalesced into baseline here too: 771 subjects (294 of them
+    MCI) carry a diagnosis only at the screening visit and no 'bl' row at
+    all, so a strict 'bl'-only rule silently drops them from the cohort --
+    and drops them unevenly by ADNI phase, which would bias the sample. A
+    genuine 'bl' diagnosis always takes priority where both exist, so a
+    subject who was MCI at screening but already Dementia at baseline is
+    still correctly read as Dementia (and thus excluded from an
+    MCI-at-baseline cohort).
+    """
     dx = _load("DXSUM")
     dx["VISIT"] = _harmonized_visit(dx)
     dx = dx[["RID", "VISIT", "EXAMDATE", "DIAGNOSIS", "COLPROT"]].dropna(subset=["RID", "DIAGNOSIS"])
+    dx = _coalesce_screening_into_baseline(dx)
     dx = dx.rename(columns={"DIAGNOSIS": "DX"})
     dx["Month"] = dx["VISIT"].apply(_viscode_to_month)
     dx = dx.dropna(subset=["Month"])
@@ -198,18 +207,63 @@ def load_csf() -> pd.DataFrame:
     return csf[["RID", "VISIT", "CSF_ABETA", "CSF_TAU", "CSF_PTAU"]].drop_duplicates(subset=["RID", "VISIT"], keep="first")
 
 
+# FreeSurfer ROI codes, verified present in every UCSFFSX* table (checked
+# directly per table rather than assumed to carry over across versions).
+_FS_ROI_CODES = ["ST29SV", "ST88SV", "ST10CV", "ST37SV", "ST96SV"]
+
+# Priority order for FreeSurfer source tables. UCSFFSX7 is the FreeSurfer 7.x
+# reprocessing spanning ADNI1/GO/2/3/4 and alone covers 3,195 of the 3,230
+# subjects that have any baseline-equivalent FreeSurfer row, so it goes first:
+# one consistent pipeline version for nearly everyone avoids pipeline-version
+# confounding. The older per-phase tables only fill residual gaps.
+_FS_TABLE_PRIORITY = ["UCSFFSX7", "UCSFFSX51", "UCSFFSX6", "UCSFFSX", "UCSFFSX51_ADNI1_3T"]
+
+
 def load_mri_volumes() -> pd.DataFrame:
-    """Hippocampus (ST29SV+ST88SV), ICV (ST10CV), lateral ventricles (ST37SV+ST96SV)."""
-    fsx = _load("UCSFFSX51")
-    fsx["VISIT"] = _harmonized_visit(fsx)
-    fsx = _coalesce_screening_into_baseline(fsx, extra_baseline_codes=("m03",))
-    for col in ["ST29SV", "ST88SV", "ST10CV", "ST37SV", "ST96SV"]:
-        fsx[col] = pd.to_numeric(fsx[col], errors="coerce")
-    fsx["Hippocampus"] = fsx["ST29SV"] + fsx["ST88SV"]
-    fsx["ICV"] = fsx["ST10CV"]
-    fsx["Ventricles"] = fsx["ST37SV"] + fsx["ST96SV"]
-    fsx = fsx.drop_duplicates(subset=["RID", "VISIT"], keep="first")
-    return fsx[["RID", "VISIT", "Hippocampus", "ICV", "Ventricles"]]
+    """Hippocampus (ST29SV+ST88SV), ICV (ST10CV), lateral ventricles (ST37SV+ST96SV).
+
+    Combines every UCSFFSX* pipeline-version table, because each ADNI phase's
+    scans were processed under a different FreeSurfer version with its own
+    table -- querying only one silently zeroes out whole phases (UCSFFSX51
+    alone gave 100% MRI coverage for ADNIGO/ADNI2 and exactly 0% for
+    ADNI1/3/4). Rows are taken in _FS_TABLE_PRIORITY order and deduplicated
+    per (RID, VISIT), so the newest pipeline wins where a subject-visit was
+    processed more than once.
+
+    FS_PIPELINE records which table each row came from, so pipeline version
+    can be reported and adjusted for as a covariate rather than silently
+    mixed into one column.
+
+    QC handling: rows explicitly flagged OVERALLQC == "Fail" are dropped, but
+    "Pass" is NOT required -- OVERALLQC is unpopulated (NaN) for 11,086 of
+    12,151 UCSFFSX7 rows, so requiring "Pass" would discard ~91% of the
+    primary table for being unlabeled rather than for failing QC.
+    """
+    frames = []
+    for table in _FS_TABLE_PRIORITY:
+        fsx = _load(table)
+        fsx["VISIT"] = _harmonized_visit(fsx)
+        fsx = _coalesce_screening_into_baseline(fsx, extra_baseline_codes=("m03",))
+
+        if "OVERALLQC" in fsx.columns:
+            fsx = fsx[fsx["OVERALLQC"] != "Fail"]
+
+        for col in _FS_ROI_CODES:
+            fsx[col] = pd.to_numeric(fsx[col], errors="coerce")
+
+        fsx["Hippocampus"] = fsx["ST29SV"] + fsx["ST88SV"]
+        fsx["ICV"] = fsx["ST10CV"]
+        fsx["Ventricles"] = fsx["ST37SV"] + fsx["ST96SV"]
+        fsx["FS_PIPELINE"] = table
+
+        # Drop rows with no usable volume before they can shadow a later
+        # table's populated row for the same subject-visit.
+        fsx = fsx.dropna(subset=["Hippocampus", "ICV", "Ventricles"], how="all")
+        fsx = fsx.drop_duplicates(subset=["RID", "VISIT"], keep="first")
+        frames.append(fsx[["RID", "VISIT", "Hippocampus", "ICV", "Ventricles", "FS_PIPELINE"]])
+
+    combined = pd.concat(frames, ignore_index=True)
+    return combined.drop_duplicates(subset=["RID", "VISIT"], keep="first")
 
 
 def load_field_strength() -> pd.DataFrame:
