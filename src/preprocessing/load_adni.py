@@ -200,11 +200,67 @@ def load_tau() -> pd.DataFrame:
 
 
 def load_csf() -> pd.DataFrame:
-    csf = _load("UPENNBIOMK_MASTER")
-    csf["VISIT"] = _harmonized_visit(csf)  # falls back to VISCODE -- already harmonized-style here
+    """CSF biomarkers from the Roche Elecsys assay.
+
+    Deliberately a SINGLE assay rather than a union of CSF tables. The legacy
+    UPENNBIOMK_MASTER table covers ADNI1/GO/2 only (1,249 subjects), which
+    made CSF availability both understated and phase-biased -- it produced a
+    spurious ZERO overlap between CSF and tau-PET, since tau-PET only starts
+    in ADNI3. UPENNBIOMK_ROCHE_ELECSYS spans ADNI1/GO/2/3 with 1,660 subjects.
+
+    The two assays are NOT pooled: Abeta42 on the Elecsys scale is not
+    numerically interchangeable with the legacy INNO-BIA values, so
+    concatenating them would mix measurement scales inside one feature
+    column -- a worse confound than the sample it would add.
+
+    ABETA40 is dropped: present for only 468 of 1,621 baseline rows, so it
+    would be almost entirely imputed.
+    """
+    csf = _load("UPENNBIOMK_ROCHE_ELECSYS")
+    csf["VISIT"] = _harmonized_visit(csf)
     csf = _coalesce_screening_into_baseline(csf)
-    csf = csf.rename(columns={"TAU": "CSF_TAU", "PTAU": "CSF_PTAU", "ABETA": "CSF_ABETA"})
-    return csf[["RID", "VISIT", "CSF_ABETA", "CSF_TAU", "CSF_PTAU"]].drop_duplicates(subset=["RID", "VISIT"], keep="first")
+    csf = csf.rename(
+        columns={"ABETA42": "CSF_ABETA", "TAU": "CSF_TAU", "PTAU": "CSF_PTAU"}
+    )
+    for col in ("CSF_ABETA", "CSF_TAU", "CSF_PTAU"):
+        csf[col] = pd.to_numeric(csf[col], errors="coerce")
+    csf["CSF_ASSAY"] = "roche_elecsys"
+    return csf[["RID", "VISIT", "CSF_ABETA", "CSF_TAU", "CSF_PTAU", "CSF_ASSAY"]].drop_duplicates(
+        subset=["RID", "VISIT"], keep="first"
+    )
+
+
+def load_plasma() -> pd.DataFrame:
+    """Plasma (blood-based) biomarkers from the C2N PrecivityAD2 assay.
+
+    Included because blood biomarkers are the cheap, low-burden rung of the
+    modern diagnostic pathway -- plasma p-tau217 is the marker the 2024-25
+    literature reports as competitive with amyloid PET for amyloid status,
+    and staged "plasma first, confirmatory scan only if needed" testing is
+    exactly the decision this project models. Spans all phases including
+    ADNI4, though only 262 subjects have a baseline draw, so plasma-block
+    analyses will be small and are flagged as underpowered where relevant.
+
+    APS2 is C2N's own composite amyloid-probability score; it is kept out of
+    the feature block because it is a vendor model output rather than a raw
+    measurement, and feeding another model's prediction in as a feature would
+    muddy what the acquisition policy is actually learning from.
+    """
+    pl = _load("C2N_PRECIVITYAD2_PLASMA")
+    pl["VISIT"] = _harmonized_visit(pl)
+    pl = _coalesce_screening_into_baseline(pl)
+    pl = pl.rename(
+        columns={
+            "pT217_C2N": "PLASMA_PTAU217",
+            "AB42_AB40_C2N": "PLASMA_AB42_AB40",
+            "pT217_npT217_C2N": "PLASMA_PTAU217_RATIO",
+        }
+    )
+    for col in ("PLASMA_PTAU217", "PLASMA_AB42_AB40", "PLASMA_PTAU217_RATIO"):
+        pl[col] = pd.to_numeric(pl[col], errors="coerce")
+    return pl[
+        ["RID", "VISIT", "PLASMA_PTAU217", "PLASMA_AB42_AB40", "PLASMA_PTAU217_RATIO"]
+    ].drop_duplicates(subset=["RID", "VISIT"], keep="first")
 
 
 # FreeSurfer ROI codes, verified present in every UCSFFSX* table (checked
@@ -306,6 +362,7 @@ def build_subject_visits() -> pd.DataFrame:
         load_amyloid,
         load_tau,
         load_csf,
+        load_plasma,
         load_mri_volumes,
         load_field_strength,
     ):

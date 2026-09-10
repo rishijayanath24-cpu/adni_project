@@ -72,15 +72,29 @@ def build_cohort(subject_visits: pd.DataFrame) -> pd.DataFrame:
             "MMSE_bl": base_row["MMSE"],
             "CDRSB_bl": base_row["CDRSB"],
             "Hippocampus_bl": base_row["Hippocampus"],
+            "ICV_bl": base_row.get("ICV"),
+            "Ventricles_bl": base_row.get("Ventricles"),
             "FDG_bl": base_row["FDG"],
             "AMYLOID_SUVR_bl": base_row["AMYLOID_SUVR"],
             "AMYLOID_STATUS_bl": base_row.get("AMYLOID_STATUS"),
             "TAU_SUVR_bl": base_row.get("TAU_SUVR"),
             "CSF_ABETA_bl": base_row["CSF_ABETA"],
+            "CSF_TAU_bl": base_row.get("CSF_TAU"),
             "CSF_PTAU_bl": base_row["CSF_PTAU"],
+            "PLASMA_PTAU217_bl": base_row.get("PLASMA_PTAU217"),
+            "PLASMA_AB42_AB40_bl": base_row.get("PLASMA_AB42_AB40"),
+            # Per-modality availability. FDG, amyloid and tau PET are SEPARATE
+            # scans with separate tracers and separate costs -- ordering one
+            # does not yield the others, so they are tracked (and later
+            # acquired) independently rather than as one "PET" block.
             "HAS_MRI_bl": pd.notna(base_row["Hippocampus"]),
-            "HAS_PET_bl": pd.notna(base_row["FDG"]) or pd.notna(base_row["AMYLOID_SUVR"]),
+            "HAS_FDG_bl": pd.notna(base_row["FDG"]),
+            "HAS_AMYLOID_bl": pd.notna(base_row["AMYLOID_SUVR"]),
+            "HAS_TAU_bl": pd.notna(base_row.get("TAU_SUVR")),
             "HAS_CSF_bl": pd.notna(base_row["CSF_ABETA"]) or pd.notna(base_row["CSF_PTAU"]),
+            "HAS_PLASMA_bl": pd.notna(base_row.get("PLASMA_PTAU217")),
+            # Retained for cohort-table reporting only ("had any PET at all").
+            "HAS_PET_bl": pd.notna(base_row["FDG"]) or pd.notna(base_row["AMYLOID_SUVR"]),
             "N_VISITS": len(subj_visits),
             "LAST_MONTH_SEEN": subj_visits["Month"].max(),
         }

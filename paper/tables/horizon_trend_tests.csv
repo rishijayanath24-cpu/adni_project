@@ -1,0 +1,6 @@
+block,horizon_from,horizon_to,n,n_pos_from,n_pos_to,underpowered,delta_of_deltas,lo,hi,significant
+MRI,12,36,657,95,238,False,-0.0192,-0.057,0.0155,False
+FDG,12,36,509,56,157,False,0.0195,-0.0142,0.0543,False
+AMYLOID,12,36,392,38,99,False,0.0536,0.0141,0.0952,True
+TAU,24,36,105,14,24,True,0.022,-0.0937,0.1336,False
+CSF,12,36,464,63,155,False,0.0238,-0.0094,0.0554,False

@@ -2,6 +2,9 @@
 data/raw/
 data/processed/
 *.csv
+# ...but aggregate result tables carry no subject-level data and are
+# part of the paper, so they are tracked.
+!paper/tables/*.csv
 *.nii
 *.nii.gz
 
