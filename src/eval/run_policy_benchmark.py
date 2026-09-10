@@ -50,7 +50,7 @@ from src.baselines.dqn import DQNPolicy
 from src.baselines.promuse import ProMUSE
 from src.baselines.reference import AcquireAll, CheapOnly, FixedOrder, RandomSubset
 from src.baselines.umos import UMoS
-from src.eval.metrics import auc, bootstrap_ci, brier
+from src.eval.metrics import auc, bootstrap_ci, bootstrap_delta_ci, brier
 from src.models.features import COST_REGIMES, subjects_with_blocks
 from src.preprocessing.cohort import build_cohort
 from src.preprocessing.leakage_checks import assert_no_subject_leakage
@@ -134,6 +134,78 @@ def evaluate_policy(name, factory, dev: pd.DataFrame, label_col: str) -> dict:
     return row, probs, acquired
 
 
+def paired_comparisons(
+    oof: dict, y: np.ndarray, references: list[str], results: pd.DataFrame
+) -> pd.DataFrame:
+    """Paired bootstrap of every policy against chosen reference policies.
+
+    Comparing two policies by whether their independent CIs overlap is a weak
+    test -- overlapping intervals routinely hide a real paired difference and
+    vice versa. Since every policy is scored on the SAME subjects here, the
+    paired delta is the right comparison and is far more sensitive.
+
+    Two references matter for the project's central question:
+      acquire_all    -- can a selective policy match scanning everyone?
+      random_rate0.5 -- does the policy beat acquiring at random? If not,
+                        it has not demonstrated that its *decisions* carry
+                        information, only that more data helps.
+    """
+    cost_by_policy = dict(zip(results["policy"], results["cost_price_like"]))
+    rows = []
+    for ref in references:
+        if ref not in oof:
+            continue
+        for name, probs in oof.items():
+            if name == ref:
+                continue
+            d, lo, hi = bootstrap_delta_ci(y, oof[ref], probs, auc, seed=RANDOM_STATE)
+            rows.append(
+                dict(
+                    policy=name,
+                    reference=ref,
+                    delta_auc=round(d, 4),
+                    lo=round(lo, 4),
+                    hi=round(hi, 4),
+                    significant=bool(lo > 0 or hi < 0),
+                    cost_policy=cost_by_policy.get(name),
+                    cost_reference=cost_by_policy.get(ref),
+                    cheaper_than_reference=bool(
+                        cost_by_policy.get(name, np.inf) < cost_by_policy.get(ref, np.inf)
+                    ),
+                )
+            )
+    return pd.DataFrame(rows)
+
+
+def cost_matched_table(results: pd.DataFrame) -> pd.DataFrame:
+    """For each policy, the cheapest NON-LEARNED policy that is at least as good.
+
+    This is the comparison that decides whether personalised acquisition is
+    worth anything: a learned policy must beat a dumb fixed or random rule at
+    equal-or-lower cost. If a fixed rule matches it for less, the
+    personalisation is not buying anything.
+    """
+    dumb = results[results["policy"].str.startswith(("fixed_", "random_", "cheap_only", "acquire_all"))]
+    rows = []
+    for _, r in results.iterrows():
+        if r["policy"] in set(dumb["policy"]):
+            continue
+        beaten_by = dumb[
+            (dumb["auc"] >= r["auc"]) & (dumb["cost_price_like"] <= r["cost_price_like"])
+        ].sort_values("cost_price_like")
+        rows.append(
+            dict(
+                policy=r["policy"],
+                auc=r["auc"],
+                cost=r["cost_price_like"],
+                dominated_by=beaten_by.iloc[0]["policy"] if len(beaten_by) else "",
+                dominator_auc=beaten_by.iloc[0]["auc"] if len(beaten_by) else np.nan,
+                dominator_cost=beaten_by.iloc[0]["cost_price_like"] if len(beaten_by) else np.nan,
+            )
+        )
+    return pd.DataFrame(rows)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--horizon", type=int, default=24)
@@ -164,10 +236,12 @@ def main() -> None:
         factories = {k: v for k, v in factories.items() if k in wanted}
 
     rows = []
+    oof: dict = {}
     for name, factory in factories.items():
         print(f"running {name} ...", flush=True)
-        row, _, _ = evaluate_policy(name, factory, dev, label_col)
+        row, probs, _ = evaluate_policy(name, factory, dev, label_col)
         rows.append(row)
+        oof[name] = probs
         print(f"   AUC={row['auc']:.4f} [{row['auc_lo']:.4f},{row['auc_hi']:.4f}]  "
               f"cost(price_like)={row['cost_price_like']:.2f}  "
               f"blocks={row['mean_n_blocks']:.2f}  ({row['fit_seconds']}s)")
@@ -179,6 +253,21 @@ def main() -> None:
     show = ["policy", "n", "n_pos", "auc", "auc_lo", "auc_hi", "brier",
             "cost_price_like", "cost_flat", "mean_n_blocks"] + [f"acq_{b}" for b in BLOCKS]
     print(results[show].to_string(index=False))
+
+    y_dev = dev[label_col].astype(int).to_numpy()
+    paired = paired_comparisons(oof, y_dev, ["acquire_all", "random_rate0.5"], results)
+    if not paired.empty:
+        print()
+        print("=== PAIRED COMPARISONS (same subjects; positive = policy beats reference) ===")
+        print(paired.to_string(index=False))
+        paired.to_csv(f"paper/tables/policy_paired_{args.horizon}mo.csv", index=False)
+
+    dom = cost_matched_table(results)
+    if not dom.empty:
+        print()
+        print("=== COST DOMINATION: is a learned policy beaten by a dumb rule that costs no more? ===")
+        print(dom.to_string(index=False))
+        dom.to_csv(f"paper/tables/policy_domination_{args.horizon}mo.csv", index=False)
 
     out = f"paper/tables/policy_benchmark_{args.horizon}mo.csv"
     results.to_csv(out, index=False)
