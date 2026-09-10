@@ -1,0 +1,2 @@
+policy,n,n_pos,auc,auc_lo,auc_hi,brier,fit_seconds,cost_price_like,cost_flat,cost_burden,acq_MRI,acq_FDG,acq_AMYLOID,acq_CSF,mean_n_blocks
+dqn_lambda0.05,365,67,0.8624,0.8172,0.9061,0.1092,336.4,2.026,1.233,4.132,0.438,0.312,0.068,0.414,1.233
