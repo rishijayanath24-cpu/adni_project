@@ -11,9 +11,10 @@ a positive one — the savings those policies chase are available anyway from
 better inputs, reaching all-modality accuracy at a third to a tenth of the
 acquisition cost.
 
-**The held-out test set has never been touched.** `src/eval/run_final_test.py`
-is ready and refuses to run without `--i-am-sure`. Spend it once, on the
-final version of the claims.
+**The held-out test set has now been spent** (once, 12 Sep 2026 — Findings
+§10). The headline claim confirms: MRI-only at cost 1.0 is not significantly
+worse than acquiring all four modalities at cost 9.5, with the 36-month case
+marginal as predicted.
 
 Outstanding: a formal Scopus/Web of Science novelty search, and the write-up.
 
@@ -105,7 +106,7 @@ row exists, with a genuine `bl` row always winning.
     novelty claim.
 11. ⬜ Write-up.
 12. ✅ Final models trained, documented and persisted (`models/`).
-13. ⬜ Spend the locked test set (once) — `src/eval/run_final_test.py`.
+13. ✅ Locked test set spent once (12 Sep 2026); results in Findings §10.
 
 ## Findings so far
 
@@ -321,6 +322,44 @@ and card are tracked.
 python -m src.models.train_final --all-horizons   # fit + persist
 python -m src.models.nested_cv --all-horizons     # honest estimate
 ```
+
+### 10. Final confirmatory test-set evaluation (spent once, 2026-09-12)
+The held-out test set was untouched through every experiment above and has
+now been spent exactly once, on the models as trained. Test AUC:
+
+| model | cost | 12mo | 24mo | 36mo |
+|---|---|---|---|---|
+| cheap_only | 0.0 | 0.9155 | 0.8506 | 0.8196 |
+| **ours_MRI** | **1.0** | **0.9469** | **0.9106** | 0.8519 |
+| fixed_MRI+FDG | 3.0 | 0.9348 | 0.8957 | 0.8886 |
+| **ours_MRI+FDG** | **3.0** | **0.9505** | 0.9051 | **0.8937** |
+| acquire_all | 9.5 | 0.9275 | 0.9231 | 0.9333 |
+
+**The headline claim holds, with one qualification.** Paired against
+acquiring all four modalities (cost 9.5):
+
+| model | 12mo | 24mo | 36mo |
+|---|---|---|---|
+| ours_MRI (cost 1.0) | +0.019 [−0.023, +0.071] | −0.013 [−0.076, +0.044] | −0.081 [−0.177, **+0.003**] |
+| ours_MRI+FDG (cost 3.0) | +0.023 [−0.005, +0.056] | −0.018 [−0.101, +0.041] | −0.040 [−0.104, +0.018] |
+
+Neither is significantly worse than acquire-all at any horizon. At cost 3.0
+the claim is comfortable everywhere. At cost 1.0 it is comfortable at 12 and
+24 months but **marginal at 36 months**, where the point estimate is −0.081
+and the interval only just includes zero — exactly the weakness the
+development analysis flagged in advance (−0.033, CI upper +0.002 there).
+
+**Three cautions that must travel with these numbers:**
+
+1. **The test sets are small** — 9, 17 and 22 converters at 12, 24 and 36
+   months. Confidence intervals are correspondingly wide, so "not
+   significantly worse" is weak evidence of equivalence, not strong. A
+   non-significant result at 9 converters says little.
+2. **Test figures run above development figures**, by up to +0.074 at 12
+   months. That is small-sample noise, not a real gain. **Quote the nested-CV
+   figures (§9) as expected performance**, not these.
+3. **This was one shot.** The numbers above are the result; re-running the
+   script after seeing them would not produce a fresh test set.
 
 ### Implication for the paper
 The project has both halves of a coherent paper:
