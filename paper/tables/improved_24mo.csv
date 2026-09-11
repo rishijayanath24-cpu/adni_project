@@ -1,0 +1,17 @@
+policy,auc,auc_lo,auc_hi,brier,cost,mean_blocks,predictor,delta_vs_baseline,delta_lo,delta_hi,improved
+cheap_only,0.8243,0.77,0.8749,0.1159,0.0,0.0,subset_models (baseline),,,,
+cheap_only,0.839,0.7881,0.8853,0.1159,0.0,0.0,pooled (ours),0.0147,-0.0013,0.0315,False
+fixed_MRI,0.8697,0.8255,0.9113,0.1092,1.0,1.0,subset_models (baseline),,,,
+fixed_MRI,0.8823,0.8433,0.917,0.1058,1.0,1.0,pooled (ours),0.0126,-0.0073,0.0332,False
+fixed_MRI+FDG,0.8869,0.8514,0.9215,0.1061,3.0,2.0,subset_models (baseline),,,,
+fixed_MRI+FDG,0.8901,0.8542,0.9214,0.1009,3.0,2.0,pooled (ours),0.0033,-0.0218,0.0247,False
+acquire_all,0.8935,0.8574,0.9252,0.1045,9.5,4.0,subset_models (baseline),,,,
+acquire_all,0.8935,0.8574,0.9252,0.1045,9.5,4.0,pooled (ours),0.0,0.0,0.0,False
+random_rate0.5,0.8992,0.8637,0.9322,0.0975,5.089,2.11,subset_models (baseline),,,,
+random_rate0.5,0.8855,0.846,0.9237,0.0996,5.089,2.11,pooled (ours),-0.0137,-0.0289,0.0002,False
+umos_mri_to_amyloid,0.8857,0.8447,0.9236,0.105,3.644,1.529,subset_models (baseline),,,,
+umos_mri_to_amyloid,0.8689,0.8202,0.9136,0.1083,3.658,1.532,pooled (ours),-0.0168,-0.0471,0.0106,False
+promuse_full_ladder_sharedpred,0.8952,0.8601,0.9294,0.1021,4.722,1.989,subset_models (baseline),,,,
+promuse_full_ladder_sharedpred,0.8851,0.8484,0.922,0.1062,4.722,1.989,pooled (ours),-0.0101,-0.0264,0.0041,False
+dqn_lambda0.05,0.8711,0.8274,0.9123,0.1103,1.756,1.2,subset_models (baseline),,,,
+dqn_lambda0.05,0.8797,0.841,0.9165,0.1034,2.255,1.466,pooled (ours),0.0086,-0.0193,0.0331,False

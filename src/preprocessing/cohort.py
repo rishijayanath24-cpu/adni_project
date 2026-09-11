@@ -71,9 +71,16 @@ def build_cohort(subject_visits: pd.DataFrame) -> pd.DataFrame:
             "APOE4": base_row["APOE4"],
             "MMSE_bl": base_row["MMSE"],
             "CDRSB_bl": base_row["CDRSB"],
-            "Hippocampus_bl": base_row["Hippocampus"],
-            "ICV_bl": base_row.get("ICV"),
-            "Ventricles_bl": base_row.get("Ventricles"),
+            # AD-signature FreeSurfer ROIs (see load_adni._AD_SIGNATURE_ROIS).
+            **{
+                f"{roi}_bl": base_row.get(roi)
+                for roi in (
+                    "Hippocampus", "Amygdala", "Entorhinal_CV", "Entorhinal_TA",
+                    "Fusiform_CV", "MidTemporal_CV", "InfTemporal_CV",
+                    "ParaHippocampal_CV", "Precuneus_CV", "PosteriorCingulate_CV",
+                    "Ventricles", "ICV",
+                )
+            },
             "FDG_bl": base_row["FDG"],
             "AMYLOID_SUVR_bl": base_row["AMYLOID_SUVR"],
             "AMYLOID_STATUS_bl": base_row.get("AMYLOID_STATUS"),

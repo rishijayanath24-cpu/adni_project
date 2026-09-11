@@ -263,9 +263,26 @@ def load_plasma() -> pd.DataFrame:
     ].drop_duplicates(subset=["RID", "VISIT"], keep="first")
 
 
-# FreeSurfer ROI codes, verified present in every UCSFFSX* table (checked
-# directly per table rather than assumed to carry over across versions).
-_FS_ROI_CODES = ["ST29SV", "ST88SV", "ST10CV", "ST37SV", "ST96SV"]
+# AD-signature FreeSurfer ROIs, left/right code pairs, looked up in
+# DATADIC_01Sep2026.csv and verified present in the UCSFFSX* tables.
+# The original MRI block used hippocampus, ICV and ventricles only -- three
+# features out of a 366-column table -- which understates what an MRI
+# actually contributes. These are the regions the AD-signature literature
+# uses (medial-temporal and posterior-cingulate/precuneus).
+_AD_SIGNATURE_ROIS = {
+    "Hippocampus": ("ST29SV", "ST88SV"),
+    "Amygdala": ("ST12SV", "ST71SV"),
+    "Entorhinal_CV": ("ST24CV", "ST83CV"),
+    "Entorhinal_TA": ("ST24TA", "ST83TA"),
+    "Fusiform_CV": ("ST26CV", "ST85CV"),
+    "MidTemporal_CV": ("ST40CV", "ST99CV"),
+    "InfTemporal_CV": ("ST32CV", "ST91CV"),
+    "ParaHippocampal_CV": ("ST44CV", "ST103CV"),
+    "Precuneus_CV": ("ST52CV", "ST111CV"),
+    "PosteriorCingulate_CV": ("ST50CV", "ST109CV"),
+    "Ventricles": ("ST37SV", "ST96SV"),
+}
+_FS_ROI_CODES = sorted({c for pair in _AD_SIGNATURE_ROIS.values() for c in pair} | {"ST10CV"})
 
 # Priority order for FreeSurfer source tables. UCSFFSX7 is the FreeSurfer 7.x
 # reprocessing spanning ADNI1/GO/2/3/4 and alone covers 3,195 of the 3,230
@@ -307,16 +324,22 @@ def load_mri_volumes() -> pd.DataFrame:
         for col in _FS_ROI_CODES:
             fsx[col] = pd.to_numeric(fsx[col], errors="coerce")
 
-        fsx["Hippocampus"] = fsx["ST29SV"] + fsx["ST88SV"]
+        for name, (lh, rh) in _AD_SIGNATURE_ROIS.items():
+            # Sum left+right for volumes; average for thickness, where summing
+            # two thicknesses would be meaningless.
+            if name.endswith("_TA"):
+                fsx[name] = (fsx[lh] + fsx[rh]) / 2.0
+            else:
+                fsx[name] = fsx[lh] + fsx[rh]
         fsx["ICV"] = fsx["ST10CV"]
-        fsx["Ventricles"] = fsx["ST37SV"] + fsx["ST96SV"]
         fsx["FS_PIPELINE"] = table
 
         # Drop rows with no usable volume before they can shadow a later
         # table's populated row for the same subject-visit.
-        fsx = fsx.dropna(subset=["Hippocampus", "ICV", "Ventricles"], how="all")
+        roi_cols = list(_AD_SIGNATURE_ROIS) + ["ICV"]
+        fsx = fsx.dropna(subset=roi_cols, how="all")
         fsx = fsx.drop_duplicates(subset=["RID", "VISIT"], keep="first")
-        frames.append(fsx[["RID", "VISIT", "Hippocampus", "ICV", "Ventricles", "FS_PIPELINE"]])
+        frames.append(fsx[["RID", "VISIT", *roi_cols, "FS_PIPELINE"]])
 
     combined = pd.concat(frames, ignore_index=True)
     return combined.drop_duplicates(subset=["RID", "VISIT"], keep="first")

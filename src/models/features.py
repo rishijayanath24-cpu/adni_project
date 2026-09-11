@@ -34,7 +34,17 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 BLOCKS: dict[str, list[str]] = {
     "CHEAP": ["AGE", "PTEDUCAT", "APOE4", "MMSE_bl", "CDRSB_bl", "PTGENDER"],
-    "MRI": ["Hippocampus_bl", "ICV_bl", "Ventricles_bl"],
+    # AD-signature regions, not just hippocampus. The original three-feature
+    # block understated what a structural MRI contributes -- it used 3 of the
+    # 366 columns the FreeSurfer table actually provides.
+    # MRI_MINIMAL below preserves the original block so the ablation can
+    # attribute the gain to the feature set rather than to anything else.
+    "MRI": [
+        "Hippocampus_bl", "Amygdala_bl", "Entorhinal_CV_bl", "Entorhinal_TA_bl",
+        "Fusiform_CV_bl", "MidTemporal_CV_bl", "InfTemporal_CV_bl",
+        "ParaHippocampal_CV_bl", "Precuneus_CV_bl", "PosteriorCingulate_CV_bl",
+        "Ventricles_bl", "ICV_bl",
+    ],
     # FDG, amyloid and tau are separate scans with separate tracers and
     # separate costs -- ordering an amyloid scan does not hand you tau, so
     # they are separate acquirable blocks rather than one "PET" block.
@@ -48,6 +58,21 @@ BLOCKS: dict[str, list[str]] = {
     # for it first is the clinically realistic comparison.
     "PLASMA": ["PLASMA_PTAU217_bl", "PLASMA_AB42_AB40_bl"],
 }
+
+# Original three-feature MRI block, kept for the ablation in
+# src/eval/run_ablation.py.
+MRI_MINIMAL = ["Hippocampus_bl", "ICV_bl", "Ventricles_bl"]
+MRI_SIGNATURE = list(BLOCKS["MRI"])
+
+
+def set_mri_block(which: str) -> None:
+    """Swap the MRI feature block between 'minimal' and 'signature'.
+
+    Used only by the ablation, so the contribution of richer MRI features can
+    be separated from the contribution of pooled training.
+    """
+    BLOCKS["MRI"] = list(MRI_MINIMAL if which == "minimal" else MRI_SIGNATURE)
+
 
 CATEGORICAL_FEATURES = {"PTGENDER"}
 
