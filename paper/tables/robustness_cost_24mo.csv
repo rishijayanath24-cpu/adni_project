@@ -1,0 +1,10 @@
+policy,auc,cost,dominated,dominated_by,regime
+umos_mri_to_amyloid,0.8786,3.644,True,fixed_MRI+FDG,price_like
+promuse_full_ladder_sharedpred,0.8903,4.67,False,,price_like
+dqn_lambda0.05,0.8518,1.634,True,fixed_MRI,price_like
+umos_mri_to_amyloid,0.8786,1.529,False,,flat
+promuse_full_ladder_sharedpred,0.8903,1.978,False,,flat
+dqn_lambda0.05,0.8518,1.038,True,fixed_MRI,flat
+umos_mri_to_amyloid,0.8786,3.115,False,,burden
+promuse_full_ladder_sharedpred,0.8903,6.855,False,,burden
+dqn_lambda0.05,0.8518,3.441,True,fixed_MRI,burden

@@ -150,10 +150,15 @@ beats *random* acquisition at any horizon (only `acquire_all` does, and
 only at 36 months). Twelve policy-horizon pairs are significantly *worse*
 than random.
 
-**Q2 — is the personalisation worth its price? No.** Every learned policy
-is dominated at every horizon by a patient-independent rule that costs no
-more — usually `fixed_MRI+FDG` (cost 3.00), which matches or beats UMoS,
-ProMUSE and the DQN while ignoring the patient entirely.
+**Q2 — is the personalisation worth its price? Usually not, but this one
+is cost-assumption dependent.** Under the price-like cost regime most
+learned policies are dominated by a patient-independent rule costing no
+more — usually `fixed_MRI+FDG` (cost 3.00). A robustness sweep (Findings
+§5) shows this is *not* regime-independent: the DQN is dominated under all
+three cost regimes, UMoS only under price-like, and ProMUSE's full ladder
+under none. Q1 is the regime-independent claim, since it is a paired
+statistical test that makes no cost assumption at all; Q2 should be
+reported with its cost caveat attached.
 
 The large cost savings these papers report do reproduce in the weak sense:
 you *can* cut acquisition cost substantially without losing accuracy. But
@@ -181,6 +186,15 @@ Benjamini-Hochberg across ~30 (policy, modality) tests.
 
 **Fixed policies have zero acquisition disparity by construction** — they
 ignore the patient — while matching or beating the learned policies on AUC.
+
+### 5. Robustness of the negative result
+The central claim was stress-tested rather than asserted.
+
+| check | result |
+|---|---|
+| Cost regime (price_like / flat / burden) | Domination is **regime-dependent**: DQN dominated under all three, UMoS under one, ProMUSE's full ladder under none. Corrected in Q2 above. |
+| Predictor (logistic regression → gradient boosting) | Negative result **strengthens**. All three learned policies dominated; `fixed_MRI+FDG` reaches 0.878 at cost 3.0, matching `acquire_all` (0.878) at a third of the cost. Not an artifact of a weak predictor. |
+| CV / policy seed (0 / 7 / 42) | **Stable.** Per-policy SD 0.003-0.011. Mean ordering unchanged: random 0.886 still above every learned policy; `fixed_MRI+FDG` 0.884 ties ProMUSE (0.884) and beats UMoS (0.881) and DQN (0.873) at lower cost. |
 
 ### Implication for the paper
 Both original novelty claims landed as null results. The defensible
