@@ -36,9 +36,16 @@ warnings.filterwarnings(
 from src.eval.metrics import brier, calibration_table, decision_curve
 from src.eval.run_policy_benchmark import RANDOM_STATE, evaluate_policy, policy_factories
 from src.eval.run_robustness import load_dev
+from src.models.features import subjects_with_blocks
+from src.preprocessing.cohort import build_cohort
+from src.preprocessing.load_adni import build_subject_visits
+from src.preprocessing.splits import subject_level_split
+from src.eval.run_policy_benchmark import BLOCKS
 
 POLICIES = [
     "cheap_only",
+    "ours_MRI",
+    "ours_MRI+FDG",
     "fixed_MRI+FDG",
     "umos_mri_to_amyloid",
     "promuse_full_ladder_sharedpred",
@@ -66,18 +73,32 @@ def calibration_slope_intercept(y: np.ndarray, p: np.ndarray) -> tuple[float, fl
     return float(lr.coef_[0][0]), float(lr.intercept_[0])
 
 
+def load_dev_with_pool(horizon: int):
+    """Development cohort plus the partially-observed pool our config trains on."""
+    label_col = f"LABEL_{horizon}mo"
+    cohort = build_cohort(build_subject_visits())
+    labelled = cohort[cohort[label_col].notna()].copy()
+    complete = subjects_with_blocks(labelled, BLOCKS)
+    split = subject_level_split(complete, label_col=label_col, random_state=RANDOM_STATE)
+    dev = complete[complete["RID"].isin(split.train_rids | split.val_rids)].copy()
+    pool = labelled[
+        (~labelled["RID"].isin(split.test_rids)) & (~labelled["RID"].isin(dev["RID"]))
+    ].copy()
+    return dev, label_col, pool
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--horizon", type=int, default=24)
     args = ap.parse_args()
 
-    dev, label_col = load_dev(args.horizon)
+    dev, label_col, extra_pool = load_dev_with_pool(args.horizon)
     y = dev[label_col].astype(int).to_numpy()
     prevalence = float(y.mean())
     print(f"{args.horizon}-month horizon: n={len(dev)}, converters={int(y.sum())} "
           f"(prevalence {prevalence:.3f})\n")
 
-    factories = policy_factories()
+    factories = policy_factories(extra_pool=extra_pool)
     cal_rows, dca_rows, summary = [], [], []
 
     for name in POLICIES:

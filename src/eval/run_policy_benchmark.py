@@ -47,6 +47,7 @@ import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 
 from src.baselines.dqn import DQNPolicy
+from src.baselines.ours import OursFixed
 from src.baselines.promuse import ProMUSE
 from src.baselines.reference import AcquireAll, CheapOnly, FixedOrder, RandomSubset
 from src.baselines.umos import UMoS
@@ -62,7 +63,7 @@ BLOCKS = ["MRI", "FDG", "AMYLOID", "CSF"]
 N_FOLDS = 5
 
 
-def policy_factories(quick: bool = False) -> dict:
+def policy_factories(quick: bool = False, extra_pool=None) -> dict:
     """Each entry builds a FRESH policy, so every CV fold refits from scratch."""
     episodes = 800 if quick else 4000
     factories = {
@@ -87,6 +88,13 @@ def policy_factories(quick: bool = False) -> dict:
             ["MRI", "AMYLOID"], target_escalation_rate=0.5, predictor="shared"
         ),
     }
+    # Our configuration: trivial fixed policy, better inputs (see
+    # src/baselines/ours.py). Only available when the runner supplies the
+    # pool of partially-observed subjects to train on.
+    if extra_pool is not None:
+        factories["ours_MRI"] = lambda: OursFixed(["MRI"], extra_pool=extra_pool)
+        factories["ours_MRI+FDG"] = lambda: OursFixed(["MRI", "FDG"], extra_pool=extra_pool)
+
     # Sweeping the DQN's cost weight traces the frontier from one policy.
     for lam in ([0.05] if quick else [0.01, 0.05, 0.2]):
         factories[f"dqn_lambda{lam:g}"] = (
@@ -230,7 +238,14 @@ def main() -> None:
           f"(test of {len(split.test_rids)} locked away, untouched)")
     print()
 
-    factories = policy_factories(quick=args.quick)
+    # Subjects who are labelled and outside the locked test set but lack some
+    # modality -- exactly the ones complete-case analysis discards, and what
+    # our pooled configuration trains on.
+    extra_pool = labelled[
+        (~labelled["RID"].isin(split.test_rids)) & (~labelled["RID"].isin(dev["RID"]))
+    ].copy()
+
+    factories = policy_factories(quick=args.quick, extra_pool=extra_pool)
     if args.only:
         wanted = {s.strip() for s in args.only.split(",")}
         factories = {k: v for k, v in factories.items() if k in wanted}

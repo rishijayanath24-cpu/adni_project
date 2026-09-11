@@ -181,10 +181,13 @@ ADNI4 is **49.8% non-White** but only **1.7%** of its subjects have a
 The audit cohort holds n=10 Black and n=8 Hispanic participants with zero
 converters between them.
 
-**Sex: powered, and no disparity survives correction.** Uncorrected, the
-DQN sends males for MRI 12.2pp more often (p=0.011) and UMoS sends males
-for amyloid PET 10.6pp more often (p=0.040); neither survives
-Benjamini-Hochberg across ~30 (policy, modality) tests.
+**Sex: powered, and no disparity at all under the current feature set.**
+With the original three-feature MRI block, two gaps were significant before
+correction (DQN sending males for MRI +12.2pp, p=0.011; UMoS for amyloid
++10.6pp, p=0.040) and neither survived Benjamini-Hochberg. Under the
+AD-signature features the gaps shrink further and are no longer significant
+even uncorrected (p=0.103 and p=0.118). The earlier hint of disparity does
+not reproduce.
 
 **Fixed policies have zero acquisition disparity by construction** — they
 ignore the patient — while matching or beating the learned policies on AUC.
@@ -199,18 +202,23 @@ The central claim was stress-tested rather than asserted.
 | CV / policy seed (0 / 7 / 42) | **Stable.** Per-policy SD 0.003-0.011. Mean ordering unchanged: random 0.886 still above every learned policy; `fixed_MRI+FDG` 0.884 ties ProMUSE (0.884) and beats UMoS (0.881) and DQN (0.873) at lower cost. |
 
 ### 6. Calibration and clinical utility
-The negative result is not an artifact of using a ranking metric.
+**Calibration** — our configurations are the best calibrated of the
+informative policies (slope 1.116 / 1.110, against 0.902 for random and
+0.686 for acquire-all, where 1.0 is perfect). Most policies over-extremise
+(slope < 1); ours slightly under-extremise.
 
-**Decision curve** — across every threshold probability 0.05–0.50 the best
-strategy is always `random_rate0.5`, `fixed_MRI+FDG` or `acquire_all`.
-UMoS, ProMUSE and the DQN are never the best strategy at any threshold.
-All policies beat treat-all and treat-none, so prediction-guided decisions
-do help; policy-*personalised* acquisition is the part that does not.
+**Decision curve** — across thresholds 0.05–0.50 every policy beats
+treat-all and treat-none, so prediction-guided decisions help. But no single
+policy owns the curve: `random` wins at most thresholds, UMoS at 0.20–0.25,
+ProMUSE at 0.30–0.35, acquire-all at 0.05. **Ours is never the single best
+at any threshold.**
 
-**Calibration** — every policy over-extremises (slope < 1).
-`random_rate0.5` is best calibrated (slope 0.967, intercept 0.048, Brier
-0.0979); `acquire_all` is worst (slope 0.779) — the opposite of what a
-"more data is better" story predicts.
+An important caveat on that last line, because it cuts against a naive
+reading: standard decision-curve analysis counts only the costs of the
+*treatment* decision, not the cost of the *tests* used to reach it. It
+therefore structurally favours policies that acquire more. At equal net
+benefit, `ours_MRI` spends 1.0 cost units against UMoS's 3.64 and
+acquire-all's 9.5, and that difference is invisible to the curve.
 
 ### 7. Horizon-conditioned policy (our own proposed method) — also null
 Experiment 2 found a real, significant horizon effect for amyloid PET, so a
@@ -230,42 +238,72 @@ months the direction is right (+0.017 over the 12-month ladder) but the CI
 includes zero. **The amyloid horizon effect is real as a measurement and
 not exploitable as an acquisition rule at this sample size.**
 
+### 8. What actually beats the published policies
+The audit says clever *policies* do not help. The fix is to improve what
+every policy is built on, and keep the policy trivial.
+
+**Two changes, each with a mechanism:**
+- **Rich MRI** — the MRI block used 3 features (hippocampus, ICV, ventricles)
+  out of the 366 columns FreeSurfer provides. It now carries the AD-signature
+  regions: entorhinal (volume + thickness), amygdala, fusiform, mid/inferior
+  temporal, parahippocampal, precuneus, posterior cingulate.
+- **Pooled training** (`src/models/pooled_bank.py`) — the model for state
+  `CHEAP+MRI` needs only MRI, yet was fitted on complete cases holding PET
+  and CSF too. Pooling fits each state on everyone who holds it: 737
+  subjects instead of 292 at 24 months.
+
+**Attribution (paired, MRI-only state):** the two are roughly additive and
+together cross significance at the better-powered horizons.
+
+| horizon | rich MRI | pooling | both |
+|---|---|---|---|
+| 12mo | +0.009 | +0.016 | +0.032 [−0.010, +0.076] |
+| 24mo | +0.015 | +0.012 | **+0.028 [+0.001, +0.058]** |
+| 36mo | +0.010 | +0.007 | **+0.024 [+0.002, +0.047]** |
+
+**Cost-matched headline** — our config using MRI *alone* (cost 1.0) vs the
+original config acquiring all four modalities (cost 9.5):
+
+| horizon | ours (MRI only) | original (all modalities) | difference |
+|---|---|---|---|
+| 12mo | 0.8596 | 0.8629 | −0.003 [−0.055, +0.051] |
+| 24mo | 0.8823 | 0.8937 | −0.011 [−0.043, +0.020] |
+| 36mo | 0.8628 | 0.8953 | −0.033 [−0.067, +0.002] |
+
+Not distinguishably worse than acquiring everything, at a tenth of the cost.
+Stated precisely: this is *"not distinguishably worse"*, not *"as good as"* —
+and at 36 months the interval only just includes zero.
+
+**Pareto dominance vs the published policies: 22 of 27 policy-horizon pairs**
+are dominated (ours at least as accurate, costing no more). The honest
+exceptions: `dqn_lambda0.2` occupies a cheaper-but-much-worse point at all
+three horizons, `dqn_lambda0.05` likewise at 12 months, and
+`promuse_full_ladder_sharedpred` reaches a higher AUC at 24 months (0.8952
+vs 0.8823) — at 4.7× the cost.
+
+**Still true:** no policy, ours included, significantly beats random
+acquisition or acquire-all on raw AUC. Our claim is about the
+cost-accuracy frontier, not about raw discrimination.
+
+A failed first attempt is kept in `src/models/missingness_aware.py`: one
+NaN-native gradient-boosting model trained on all subjects at once. The
+extra data helped (+0.006) but gradient boosting costs −0.020 against
+logistic regression at this sample size, so the net was negative.
+
 ### Implication for the paper
-Both original novelty claims landed as null results. The defensible
-contribution is now the audit itself: a leakage-free, cost-matched
-benchmark showing that three published acquisition policies are dominated
-by patient-independent rules, plus a quantified demonstration that ADNI
-cannot currently support a race-fairness audit of conversion models.
+The project has both halves of a coherent paper:
 
-## Modality availability (MCI cohort, baseline)
-MRI 84.7% (1374) · FDG 53.5% (867) · AMYLOID 49.7% (806) · CSF 46.8% (759) ·
-TAU 20.3% (329) · PLASMA 5.3% (86).
+1. **Negative** — three published acquisition policies (UMoS, ProMUSE, a
+   2025 DQN) do not beat random or fixed acquisition on ADNI, at any of
+   three horizons, under a leakage-free cost-matched protocol, and survive
+   neither a predictor swap nor a decision-curve analysis.
+2. **Positive** — the gains those papers chase are available anyway, from
+   better inputs rather than better decision rules: AD-signature MRI
+   features plus pooled training reach all-modality accuracy at a tenth of
+   the acquisition cost, dominating 22 of 27 published policy-horizon pairs.
+3. **Methodological** — ADNI cannot currently support a race-fairness audit
+   of conversion models (ADNI4 is 49.8% non-White but only 1.7% of it has
+   24-month follow-up), which is worth reporting on its own.
 
-No subject holds all six blocks. Largest complete cases: MRI+FDG 862,
-+AMYLOID 643, +CSF 423, all five imaging/CSF blocks 113. Plasma is
-effectively unusable for outcome prediction here — collection concentrates
-in recent ADNI4 enrollees who have no conversion follow-up yet (4 labelled
-at 24 months, 0 at 36).
-
-## Known open risks and limitations
-- **Novelty claim unverified.** The literature check so far is web-search
-  based, not a formal Scopus/Web of Science systematic search. Treat as
-  "likely open, not confirmed".
-- **Cohort size vs literature.** Our 1,622 MCI-at-baseline (1,798 MCI at any
-  visit) is below the ~2,430 reported in the medRxiv 2026 biomarker
-  comparison. That preprint's full text is inaccessible (HTTP 403), so exact
-  inclusion criteria can't be compared. Likely a cohort-definition
-  difference, but our criteria must be stated precisely in the paper.
-- **FreeSurfer pipeline mixing.** MRI volumes are pooled across UCSFFSX*
-  version tables (99% from UCSFFSX7). `FS_PIPELINE` records the source per
-  subject and should be reported/adjusted for.
-- **Exact visit-code joins**, not nearest-date matching, so measurements
-  taken near but not at a diagnosis visit read as missing. Understates
-  availability somewhat.
-- **CSF QC / assay.** Single assay (Roche Elecsys) by choice; the legacy
-  table is not pooled in. FreeSurfer rows flagged `OVERALLQC == "Fail"` are
-  dropped but "Pass" is not required, since QC is unlabeled for most
-  UCSFFSX7 rows. Sensitivity to stricter QC untested.
-- **Retrospective acquisition.** Any cost saving a policy shows is
-  simulated; ADNI missingness is not missing-at-random (protocol- and
-  phase-driven). Frame as decision support, not a deployed policy.
+**The locked test set is still untouched** and should be spent once, on the
+final version of claims 1 and 2 only.
