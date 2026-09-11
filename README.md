@@ -1,10 +1,16 @@
 # Fairness- and Horizon-Audited Sequential Modality Acquisition for Alzheimer's Risk Stratification on ADNI
 
 ## Status
-Data pipeline complete and running on real ADNI data. First two experiments
-done (modality value, horizon effect). Baseline re-implementations (UMoS /
-ProMUSE / DQN-2025) not started. Literature novelty check still pending a
-formal Scopus/Web of Science search.
+Data pipeline, all three baseline re-implementations, the policy benchmark
+(12/24/36 months) and the fairness audit are done and running on real ADNI
+data. Literature novelty check still pending a formal Scopus/Web of Science
+search.
+
+**Both original novelty claims have landed as null results** (Findings §2-4).
+The horizon effect holds only for amyloid; no learned acquisition policy
+beats a random or fixed rule; and the race-fairness audit is not feasible on
+ADNI conversion cohorts. The defensible contribution is now the audit itself
+— see "Implication for the paper" below before planning further modelling.
 
 **Cohort:** 1,622 MCI-at-baseline subjects from 3,777 total. Converters:
 121 / 237 / 297 at 12 / 24 / 36 months, with reverters (110 / 107 / 104) and
