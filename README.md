@@ -1,16 +1,21 @@
 # Fairness- and Horizon-Audited Sequential Modality Acquisition for Alzheimer's Risk Stratification on ADNI
 
 ## Status
-Data pipeline, all three baseline re-implementations, the policy benchmark
-(12/24/36 months) and the fairness audit are done and running on real ADNI
-data. Literature novelty check still pending a formal Scopus/Web of Science
-search.
+Pipeline, three baseline re-implementations, the policy benchmark, the
+fairness audit, robustness sweeps, clinical-utility analysis and the final
+trained models are all complete and running on real ADNI data.
 
-**Both original novelty claims have landed as null results** (Findings §2-4).
-The horizon effect holds only for amyloid; no learned acquisition policy
-beats a random or fixed rule; and the race-fairness audit is not feasible on
-ADNI conversion cohorts. The defensible contribution is now the audit itself
-— see "Implication for the paper" below before planning further modelling.
+**The project has both halves of a paper** (Findings below): a negative
+result — no published acquisition policy beats a fixed or random rule — and
+a positive one — the savings those policies chase are available anyway from
+better inputs, reaching all-modality accuracy at a third to a tenth of the
+acquisition cost.
+
+**The held-out test set has never been touched.** `src/eval/run_final_test.py`
+is ready and refuses to run without `--i-am-sure`. Spend it once, on the
+final version of the claims.
+
+Outstanding: a formal Scopus/Web of Science novelty search, and the write-up.
 
 **Cohort:** 1,622 MCI-at-baseline subjects from 3,777 total. Converters:
 121 / 237 / 297 at 12 / 24 / 36 months, with reverters (110 / 107 / 104) and
@@ -99,6 +104,8 @@ row exists, with a genuine `bl` row always winning.
 10. ⬜ Re-run the systematic literature search before finalising the
     novelty claim.
 11. ⬜ Write-up.
+12. ✅ Final models trained, documented and persisted (`models/`).
+13. ⬜ Spend the locked test set (once) — `src/eval/run_final_test.py`.
 
 ## Findings so far
 
@@ -289,6 +296,31 @@ A failed first attempt is kept in `src/models/missingness_aware.py`: one
 NaN-native gradient-boosting model trained on all subjects at once. The
 extra data helped (+0.006) but gradient boosting costs −0.020 against
 logistic regression at this sample size, so the net was negative.
+
+### 9. Trained models
+Final models are fitted and persisted by `src/models/train_final.py`, with
+regularisation selected by CV on development data only. Performance is
+reported from **nested** cross-validation, which re-selects C inside every
+outer fold, so the figure is not the one anything was tuned on (measured
+selection optimism: +0.0008 AUC).
+
+| horizon | ours_MRI (cost 1.0) | ours_MRI+FDG (cost 3.0) | acquire-all (cost 9.5) |
+|---|---|---|---|
+| 12mo | 0.873 | **0.885** | 0.863 |
+| 24mo | 0.884 | **0.896** | 0.894 |
+| 36mo | 0.864 | 0.888 | 0.900 |
+
+At cost 3.0 the model matches or exceeds acquiring all four modalities at
+cost 9.5 at two of three horizons, and sits 0.012 below at 36 months.
+
+`models/MODEL_CARD.md` documents intended use and limitations. Binaries are
+gitignored (DUA-derived, regenerable in one command); the registry, metadata
+and card are tracked.
+
+```
+python -m src.models.train_final --all-horizons   # fit + persist
+python -m src.models.nested_cv --all-horizons     # honest estimate
+```
 
 ### Implication for the paper
 The project has both halves of a coherent paper:
