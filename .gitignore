@@ -21,3 +21,7 @@ Thumbs.db
 
 # Local tooling config
 .claude/
+
+# Trained model binaries: derived from DUA-governed ADNI data and
+# regenerable via src/models/train_final.py. Registry and card are tracked.
+models/*.pkl
