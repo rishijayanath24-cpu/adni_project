@@ -89,11 +89,13 @@ row exists, with a genuine `bl` row always winning.
 5. ✅ Re-implemented UMoS, ProMUSE and DQN-2025 (`src/baselines/`) and
    benchmarked them at 12/24/36 months.
 6. ✅ Fairness audit of acquisition behaviour (`src/eval/fairness.py`).
-7. ⬜ Horizon-conditioned acquisition policy. **Next task** — though see
-   Findings §3: the bar is now beating a fixed rule, which nothing has yet.
-8. ⬜ Fairness-constrained policy variant.
-9. ⬜ Full evaluation: cost-accuracy Pareto frontiers, calibration,
-   decision-curve analysis, fairness tables.
+7. ✅ Horizon-conditioned acquisition policy (`src/baselines/horizon_conditioned.py`)
+   — tested against horizon-swapped controls; null (Findings §7).
+8. ⛔ Fairness-constrained policy variant — **premise removed**. Findings §4
+   found no FDR-surviving acquisition disparity to correct, so building a
+   constraint against it would be fixing a problem the data does not show.
+9. ✅ Full evaluation: cost-accuracy frontiers, calibration, decision-curve
+   analysis, fairness tables, plus a three-way robustness sweep.
 10. ⬜ Re-run the systematic literature search before finalising the
     novelty claim.
 11. ⬜ Write-up.
@@ -195,6 +197,38 @@ The central claim was stress-tested rather than asserted.
 | Cost regime (price_like / flat / burden) | Domination is **regime-dependent**: DQN dominated under all three, UMoS under one, ProMUSE's full ladder under none. Corrected in Q2 above. |
 | Predictor (logistic regression → gradient boosting) | Negative result **strengthens**. All three learned policies dominated; `fixed_MRI+FDG` reaches 0.878 at cost 3.0, matching `acquire_all` (0.878) at a third of the cost. Not an artifact of a weak predictor. |
 | CV / policy seed (0 / 7 / 42) | **Stable.** Per-policy SD 0.003-0.011. Mean ordering unchanged: random 0.886 still above every learned policy; `fixed_MRI+FDG` 0.884 ties ProMUSE (0.884) and beats UMoS (0.881) and DQN (0.873) at lower cost. |
+
+### 6. Calibration and clinical utility
+The negative result is not an artifact of using a ranking metric.
+
+**Decision curve** — across every threshold probability 0.05–0.50 the best
+strategy is always `random_rate0.5`, `fixed_MRI+FDG` or `acquire_all`.
+UMoS, ProMUSE and the DQN are never the best strategy at any threshold.
+All policies beat treat-all and treat-none, so prediction-guided decisions
+do help; policy-*personalised* acquisition is the part that does not.
+
+**Calibration** — every policy over-extremises (slope < 1).
+`random_rate0.5` is best calibrated (slope 0.967, intercept 0.048, Brier
+0.0979); `acquire_all` is worst (slope 0.779) — the opposite of what a
+"more data is better" story predicts.
+
+### 7. Horizon-conditioned policy (our own proposed method) — also null
+Experiment 2 found a real, significant horizon effect for amyloid PET, so a
+policy whose escalation ladder depends on the horizon has a genuine
+mechanism to exploit. Tested against horizon-SWAPPED controls (run the
+36-month ladder at 12 months and vice versa), which isolates the horizon
+signal from the machinery:
+
+| horizon | matched vs swapped | matched vs fixed_MRI+FDG | matched vs random |
+|---|---|---|---|
+| 12 | −0.002 / −0.013, n.s. | −0.013, n.s. | −0.029, n.s. |
+| 24 | +0.001 / −0.021, n.s. | **−0.031, worse** | **−0.044, worse** |
+| 36 | +0.017 / +0.012, n.s. | −0.029, n.s. | −0.022, n.s. |
+
+The matched ladder never significantly beats its own swapped control. At 36
+months the direction is right (+0.017 over the 12-month ladder) but the CI
+includes zero. **The amyloid horizon effect is real as a measurement and
+not exploitable as an acquisition rule at this sample size.**
 
 ### Implication for the paper
 Both original novelty claims landed as null results. The defensible
