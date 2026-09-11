@@ -1,0 +1,67 @@
+policy,dimension,group,n,underpowered,acq_MRI,acq_FDG,acq_AMYLOID,acq_CSF,mean_n_blocks
+cheap_only,RACE,White,345,False,0.0,0.0,0.0,0.0,0.0
+cheap_only,RACE,Black or African American,10,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,RACE,More than one race,4,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,RACE,Asian,4,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,RACE,American Indian or Alaskan Native,1,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,RACE,Native Hawaiian or Other Pacific Islander,1,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,ETHNICITY,Not Hispanic or Latino,355,False,0.0,0.0,0.0,0.0,0.0
+cheap_only,ETHNICITY,Hispanic or Latino,8,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,ETHNICITY,Unknown,2,True,0.0,0.0,0.0,0.0,0.0
+cheap_only,SEX,Male,211,False,0.0,0.0,0.0,0.0,0.0
+cheap_only,SEX,Female,154,False,0.0,0.0,0.0,0.0,0.0
+acquire_all,RACE,White,345,False,1.0,1.0,1.0,1.0,4.0
+acquire_all,RACE,Black or African American,10,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,RACE,More than one race,4,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,RACE,Asian,4,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,RACE,American Indian or Alaskan Native,1,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,RACE,Native Hawaiian or Other Pacific Islander,1,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,ETHNICITY,Not Hispanic or Latino,355,False,1.0,1.0,1.0,1.0,4.0
+acquire_all,ETHNICITY,Hispanic or Latino,8,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,ETHNICITY,Unknown,2,True,1.0,1.0,1.0,1.0,4.0
+acquire_all,SEX,Male,211,False,1.0,1.0,1.0,1.0,4.0
+acquire_all,SEX,Female,154,False,1.0,1.0,1.0,1.0,4.0
+fixed_MRI+FDG,RACE,White,345,False,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,RACE,Black or African American,10,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,RACE,More than one race,4,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,RACE,Asian,4,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,RACE,American Indian or Alaskan Native,1,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,RACE,Native Hawaiian or Other Pacific Islander,1,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,ETHNICITY,Not Hispanic or Latino,355,False,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,ETHNICITY,Hispanic or Latino,8,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,ETHNICITY,Unknown,2,True,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,SEX,Male,211,False,1.0,1.0,0.0,0.0,2.0
+fixed_MRI+FDG,SEX,Female,154,False,1.0,1.0,0.0,0.0,2.0
+umos_mri_to_amyloid,RACE,White,345,False,1.0,0.0,0.5391,0.0,1.5391
+umos_mri_to_amyloid,RACE,Black or African American,10,True,1.0,0.0,0.3,0.0,1.3
+umos_mri_to_amyloid,RACE,More than one race,4,True,1.0,0.0,0.5,0.0,1.5
+umos_mri_to_amyloid,RACE,Asian,4,True,1.0,0.0,0.5,0.0,1.5
+umos_mri_to_amyloid,RACE,American Indian or Alaskan Native,1,True,1.0,0.0,0.0,0.0,1.0
+umos_mri_to_amyloid,RACE,Native Hawaiian or Other Pacific Islander,1,True,1.0,0.0,0.0,0.0,1.0
+umos_mri_to_amyloid,ETHNICITY,Not Hispanic or Latino,355,False,1.0,0.0,0.5352,0.0,1.5352
+umos_mri_to_amyloid,ETHNICITY,Hispanic or Latino,8,True,1.0,0.0,0.375,0.0,1.375
+umos_mri_to_amyloid,ETHNICITY,Unknown,2,True,1.0,0.0,0.0,0.0,1.0
+umos_mri_to_amyloid,SEX,Male,211,False,1.0,0.0,0.5735,0.0,1.5735
+umos_mri_to_amyloid,SEX,Female,154,False,1.0,0.0,0.4675,0.0,1.4675
+promuse_full_ladder_sharedpred,RACE,White,345,False,0.5043,0.5159,0.487,0.487,1.9942
+promuse_full_ladder_sharedpred,RACE,Black or African American,10,True,0.4,0.5,0.4,0.4,1.7
+promuse_full_ladder_sharedpred,RACE,More than one race,4,True,0.75,0.5,0.25,0.5,2.0
+promuse_full_ladder_sharedpred,RACE,Asian,4,True,0.5,0.25,0.75,0.25,1.75
+promuse_full_ladder_sharedpred,RACE,American Indian or Alaskan Native,1,True,0.0,0.0,1.0,0.0,1.0
+promuse_full_ladder_sharedpred,RACE,Native Hawaiian or Other Pacific Islander,1,True,0.0,1.0,0.0,0.0,1.0
+promuse_full_ladder_sharedpred,ETHNICITY,Not Hispanic or Latino,355,False,0.5099,0.507,0.4901,0.4789,1.9859
+promuse_full_ladder_sharedpred,ETHNICITY,Hispanic or Latino,8,True,0.125,0.875,0.25,0.625,1.875
+promuse_full_ladder_sharedpred,ETHNICITY,Unknown,2,True,0.5,0.0,0.5,0.0,1.0
+promuse_full_ladder_sharedpred,SEX,Male,211,False,0.5071,0.4787,0.5118,0.4834,1.981
+promuse_full_ladder_sharedpred,SEX,Female,154,False,0.4935,0.5584,0.4481,0.474,1.974
+dqn_lambda0.05,RACE,White,345,False,0.4203,0.2203,0.0493,0.3681,1.058
+dqn_lambda0.05,RACE,Black or African American,10,True,0.1,0.1,0.0,0.1,0.3
+dqn_lambda0.05,RACE,More than one race,4,True,0.25,0.0,0.0,0.5,0.75
+dqn_lambda0.05,RACE,Asian,4,True,0.5,0.5,0.25,0.75,2.0
+dqn_lambda0.05,RACE,American Indian or Alaskan Native,1,True,0.0,0.0,0.0,0.0,0.0
+dqn_lambda0.05,RACE,Native Hawaiian or Other Pacific Islander,1,True,0.0,0.0,0.0,0.0,0.0
+dqn_lambda0.05,ETHNICITY,Not Hispanic or Latino,355,False,0.4141,0.2197,0.0507,0.369,1.0535
+dqn_lambda0.05,ETHNICITY,Hispanic or Latino,8,True,0.125,0.125,0.0,0.25,0.5
+dqn_lambda0.05,ETHNICITY,Unknown,2,True,0.5,0.0,0.0,0.0,0.5
+dqn_lambda0.05,SEX,Male,211,False,0.4597,0.2085,0.0616,0.3697,1.0995
+dqn_lambda0.05,SEX,Female,154,False,0.3377,0.2273,0.0325,0.3571,0.9545
