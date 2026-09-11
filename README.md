@@ -80,10 +80,11 @@ row exists, with a genuine `bl` row always winning.
 3. ✅ Modality-value experiment (`src/eval/run_modality_value.py`).
 4. ✅ Horizon-effect experiment with formal trend tests
    (`src/eval/run_horizon_effect.py`).
-5. ⬜ Re-implement and validate UMoS, ProMUSE, DQN-2025 against published
-   numbers. **This is the next task.**
-6. ⬜ Fairness audit of all baselines' acquisition behaviour.
-7. ⬜ Horizon-conditioned acquisition policy.
+5. ✅ Re-implemented UMoS, ProMUSE and DQN-2025 (`src/baselines/`) and
+   benchmarked them at 12/24/36 months.
+6. ✅ Fairness audit of acquisition behaviour (`src/eval/fairness.py`).
+7. ⬜ Horizon-conditioned acquisition policy. **Next task** — though see
+   Findings §3: the bar is now beating a fixed rule, which nothing has yet.
 8. ⬜ Fairness-constrained policy variant.
 9. ⬜ Full evaluation: cost-accuracy Pareto frontiers, calibration,
    decision-curve analysis, fairness tables.
@@ -93,6 +94,7 @@ row exists, with a genuine `bl` row always winning.
 
 ## Findings so far
 
+### 1. Incremental value of each modality
 Incremental AUC over a cheap-only model (demographics + cognition + APOE),
 cross-validated on the development set, matched to subjects holding each
 block. Test set untouched.
@@ -106,10 +108,11 @@ block. Test set untouched.
 | TAU | – | +0.149† | +0.167† |
 | MRI+FDG+AMYLOID+CSF | +0.032 | +0.063* | +0.111* |
 
-`*` significant (paired bootstrap CI excludes 0); `†` underpowered.
+`*` paired bootstrap CI excludes 0; `†` underpowered.
 
-**Horizon effect** — tested on a fixed subject set labelled at all horizons,
-using a paired delta-of-deltas bootstrap (12mo → 36mo):
+### 2. Horizon effect — only amyloid survives a formal test
+On a fixed subject set labelled at all horizons, paired delta-of-deltas
+bootstrap (12mo → 36mo):
 
 | block | Δ-of-Δ | 95% CI | significant |
 |---|---|---|---|
@@ -117,13 +120,68 @@ using a paired delta-of-deltas bootstrap (12mo → 36mo):
 | CSF | +0.024 | [−0.009, +0.055] | no |
 | FDG | +0.020 | [−0.014, +0.054] | no |
 | MRI | −0.019 | [−0.057, +0.016] | no |
-| TAU | +0.022 | [−0.094, +0.134] | underpowered |
 
-The per-horizon table above *looks* like a clean monotone story across four
-modalities, and MRI looks like it declines while molecular markers rise. Only
-amyloid's horizon dependence survives a formal interaction test. The
-horizon-conditioning premise is supported specifically for amyloid PET — the
-most cost-consequential modality — and must be stated that narrowly.
+The per-horizon table looks like a clean monotone story across four
+modalities; only amyloid's horizon dependence survives an interaction test.
+State the claim that narrowly.
+
+### 3. Policy benchmark — the central negative result
+AUC by policy and horizon (mean cost in "price-like" units):
+
+| policy | cost | 12mo | 24mo | 36mo |
+|---|---|---|---|---|
+| cheap_only | 0.00 | 0.817 | 0.824 | 0.796 |
+| fixed_MRI | 1.00 | 0.827 | 0.855 | 0.839 |
+| **fixed_MRI+FDG** | 3.00 | 0.843 | 0.882 | 0.874 |
+| umos_mri_to_amyloid | 3.64 | 0.838 | 0.879 | 0.850 |
+| promuse_full_ladder_sharedpred | 4.71 | 0.836 | 0.890 | 0.870 |
+| dqn_lambda0.01 | 4.86 | 0.842 | 0.881 | 0.874 |
+| random_rate0.5 | 5.07 | 0.859 | 0.895 | 0.867 |
+| acquire_all | 9.50 | 0.863 | 0.894 | 0.895 |
+
+**Q1 — does choosing smarter help? No.** No learned policy significantly
+beats *random* acquisition at any horizon (only `acquire_all` does, and
+only at 36 months). Twelve policy-horizon pairs are significantly *worse*
+than random.
+
+**Q2 — is the personalisation worth its price? No.** Every learned policy
+is dominated at every horizon by a patient-independent rule that costs no
+more — usually `fixed_MRI+FDG` (cost 3.00), which matches or beats UMoS,
+ProMUSE and the DQN while ignoring the patient entirely.
+
+The large cost savings these papers report do reproduce in the weak sense:
+you *can* cut acquisition cost substantially without losing accuracy. But
+that saving does not come from personalisation — a fixed rule captures it
+just as well.
+
+### 4. Fairness audit
+**Race/ethnicity: infeasible on ADNI conversion cohorts today.**
+
+| stage | n | % non-White | n non-White |
+|---|---|---|---|
+| MCI at baseline | 1622 | 17.1% | 277 |
+| + has 24-month outcome | 904 | 7.6% | 69 |
+| + complete 4 modalities | 457 | 5.9% | 27 |
+
+ADNI4 is **49.8% non-White** but only **1.7%** of its subjects have a
+24-month label yet — the diversity gains are too recent to have follow-up.
+The audit cohort holds n=10 Black and n=8 Hispanic participants with zero
+converters between them.
+
+**Sex: powered, and no disparity survives correction.** Uncorrected, the
+DQN sends males for MRI 12.2pp more often (p=0.011) and UMoS sends males
+for amyloid PET 10.6pp more often (p=0.040); neither survives
+Benjamini-Hochberg across ~30 (policy, modality) tests.
+
+**Fixed policies have zero acquisition disparity by construction** — they
+ignore the patient — while matching or beating the learned policies on AUC.
+
+### Implication for the paper
+Both original novelty claims landed as null results. The defensible
+contribution is now the audit itself: a leakage-free, cost-matched
+benchmark showing that three published acquisition policies are dominated
+by patient-independent rules, plus a quantified demonstration that ADNI
+cannot currently support a race-fairness audit of conversion models.
 
 ## Modality availability (MCI cohort, baseline)
 MRI 84.7% (1374) · FDG 53.5% (867) · AMYLOID 49.7% (806) · CSF 46.8% (759) ·

@@ -1,0 +1,10 @@
+policy,auc,cost,dominated_by,dominator_auc,dominator_cost
+dqn_lambda0.2,0.8055,0.308,,,
+umos_mri_to_amyloid_at0.25,0.8426,2.171,,,
+dqn_lambda0.05,0.8325,2.425,fixed_MRI,0.839,1.0
+promuse_mri_to_amyloid,0.8408,3.141,fixed_MRI+FDG,0.8737,3.0
+promuse_mri_to_amyloid_sharedpred,0.8477,3.141,fixed_MRI+FDG,0.8737,3.0
+umos_mri_to_amyloid,0.8502,3.643,fixed_MRI+FDG,0.8737,3.0
+promuse_full_ladder,0.8696,4.715,fixed_MRI+FDG,0.8737,3.0
+promuse_full_ladder_sharedpred,0.8696,4.715,fixed_MRI+FDG,0.8737,3.0
+dqn_lambda0.01,0.8742,4.88,,,
