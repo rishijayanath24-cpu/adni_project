@@ -181,6 +181,23 @@ acquisition decisions.
 
 \section{Materials and Methods}
 
+\begin{center}
+\includegraphics[width=0.82\textwidth]{fig_pipeline_block_diagram.png}
+\vspace{5pt}
+\textbf{Figure 1.} Overview of the evaluation pipeline, from cohort
+definition through the held-out test evaluation. Always-available
+covariates (blue, left) and the four acquirable modality blocks
+(orange, right) enter a subject-level, outcome-stratified split
+performed before any preprocessing statistic is computed. Acquisition
+policies (orange) decide which blocks to acquire on the training/validation
+side only; a shared, per-fold-refit logistic-regression predictor bank
+(green) is used for every policy so that differences in outcome reflect
+differences in the acquisition decision rather than predictor strength.
+The held-out test set is untouched until the final, single evaluation at
+each of the three prediction horizons.
+\end{center}
+\vspace{10pt}
+
 \subsection{Cohort}
 Data were drawn from ADNI. Diagnosis, demographics, genotype, cognitive
 assessments, FreeSurfer morphometry, PET summaries and CSF assays were
@@ -259,7 +276,7 @@ utility as net benefit across threshold probabilities [16].
 
 \subsection{No policy outperforms random acquisition}
 Table 1 gives cross-validated AUC by policy and horizon on the development
-set. Figure 1 plots the same results as a cost-accuracy frontier. The
+set. Figure 2 plots the same results as a cost-accuracy frontier. The
 ordering is stable but the differences are small, and the
 statistical comparison is decisive: across all three horizons, \textbf{no
 learned policy significantly outperformed random acquisition}. Eleven
@@ -292,7 +309,7 @@ acquire-all & 9.50 & 0.862 & 0.894 & 0.900 \\\hline
 \begin{center}
 \includegraphics[width=\textwidth]{fig1_cost_accuracy_frontier.png}
 \vspace{5pt}
-\textbf{Figure 1.} Cost-accuracy frontier at each prediction horizon
+\textbf{Figure 2.} Cost-accuracy frontier at each prediction horizon
 (development set, cross-validated). Dashed line marks the accuracy reached
 by acquiring all four modalities at cost 9.5. Key: cheap = cheap-only;
 fix-M = fixed MRI; fix-MF = fixed MRI+FDG; rand = random acquisition;
@@ -492,20 +509,20 @@ http://adni.loni.usc.edu/wp-content/uploads/how\_to\_apply/ADNI\_Acknowledgement
 
 \section*{\fontsize{12}{12}\selectfont\textbf{References}}
 \begin{enumerate}[{[1]}]
-\item Zheng, B., Chen, X., \& Ye, Y. (2023). Uncertainty-driven modality selection for data-efficient prediction of Alzheimer's disease. \textit{IISE Transactions on Healthcare Systems Engineering, 14}(1). https://doi.org/10.1080/24725579.2023.2227197
-\item ProMUSE: Progressive multi-modal uncertainty-guided staged evidential Alzheimer disease classification. (2026). \textit{arXiv preprint} arXiv:2606.19371.
-\item Efficient Alzheimer's diagnosis through sequential decision-making with reinforcement learning. (2025). In \textit{Proceedings of the 2025 7th International Conference on Big-Data Service and Intelligent Computation}. https://doi.org/10.1145/3778265.3778280
-\item Aronsson, L., Rahbar, A., \& Chehreghani, M. H. (2025). A survey on active feature acquisition strategies. \textit{arXiv preprint}.
-\item Schutz, V., Wu, H., Rezvan, R., Aronsson, L., \& Chehreghani, M. H. (2025). AFABench: A generic framework for benchmarking active feature acquisition. \textit{arXiv preprint}.
+\item Zheng, Z., Su, Y., Chen, K., Weidman, D., Wu, T., Lo, S. C., Lure, F., \& Li, J., for the Alzheimer's Disease Neuroimaging Initiative. (2023). Uncertainty-driven modality selection for data-efficient prediction of Alzheimer's disease. \textit{IISE Transactions on Healthcare Systems Engineering, 14}(1), 18--31. https://doi.org/10.1080/24725579.2023.2227197
+\item Doan, L., Chen, B., Litton, E., Huang, H., Huang, J., Xie, Y., Zhou, W., Narayanan, N., \& Zhao, C. (2026). ProMUSE: Progressive multi-modal uncertainty-guided staged evidential Alzheimer disease classification. \textit{arXiv preprint} arXiv:2606.19371.
+\item Drissi, N., Khalil, N., El-Kassabi, H., Serhani, M. A., \& Dssouli, R. (2026). Efficient Alzheimer's diagnosis through sequential decision-making with reinforcement learning. In \textit{Proceedings of the 2025 7th International Conference on Big-Data Service and Intelligent Computation} (pp. 108--116). https://doi.org/10.1145/3778265.3778280
+\item Aronsson, L., Rahbar, A., \& Chehreghani, M. H. (2025). A survey on active feature acquisition strategies. \textit{arXiv preprint} arXiv:2502.11067.
+\item Sch\"{u}tz, V., Wu, H., Rezvan, R., Aronsson, L., \& Chehreghani, M. H. (2025). AFABench: A generic framework for benchmarking active feature acquisition. \textit{arXiv preprint} arXiv:2508.14734.
 \item von Kleist, H., Zamanian, A., Shpitser, I., \& Ahmidi, N. (2023). Evaluation of active feature acquisition methods for static feature settings. \textit{arXiv preprint} arXiv:2312.03619.
-\item Worse than random: The importance of a baseline for unsupervised feature selection. (2026). \textit{arXiv preprint} arXiv:2605.22973.
+\item Rajabinasab, M., Houle, M. E., Chelly, O., \& Zimek, A. (2026). Worse than random: The importance of a baseline for unsupervised feature selection. \textit{arXiv preprint} arXiv:2605.22973.
 \item Perets, B., Mendelson, N., Vainberg, S., Chowers, Y., Shen-Orr, S., \& Mannor, S. (2026). Zero-shot active feature acquisition via LLM-elicitation. \textit{arXiv preprint} arXiv:2606.18933.
-\item Marinescu, R. V., Oxtoby, N. P., Young, A. L., Bron, E. E., Toga, A. W., Weiner, M. W., \& Alexander, D. C. (2020). TADPOLE Challenge: Accurate Alzheimer's disease prediction through crowdsourced forecasting of future data. \textit{arXiv preprint} arXiv:2001.09016.
+\item Marinescu, R. V., Oxtoby, N. P., Young, A. L., Bron, E. E., Toga, A. W., Weiner, M. W., Barkhof, F., Fox, N. C., Golland, P., Klein, S., \& Alexander, D. C. (2020). TADPOLE Challenge: Accurate Alzheimer's disease prediction through crowdsourced forecasting of future data. \textit{arXiv preprint} arXiv:2001.09016.
 \item Dickerson, B. C., \& Wolk, D. A. (2013). Biomarker-based prediction of progression in MCI: Comparison of AD signature and hippocampal volume with spinal fluid amyloid-beta and tau. \textit{Frontiers in Aging Neuroscience, 5}, 55. https://doi.org/10.3389/fnagi.2013.00055
-\item Liu, M., Gao, Y., Yap, P.-T., \& Shen, D. (2017). Multi-stage diagnosis of Alzheimer's disease with incomplete multimodal data via multi-task deep learning. \textit{Deep Learning in Medical Image Analysis}, 1--9.
+\item Thung, K.-H., Yap, P.-T., \& Shen, D. (2017). Multi-stage diagnosis of Alzheimer's disease with incomplete multimodal data via multi-task deep learning. In \textit{Deep Learning in Medical Image Analysis and Multimodal Learning for Clinical Decision Support} (pp. 160--168). Springer. https://doi.org/10.1007/978-3-319-67558-9\_19
 \item Young, V. M., Gates, S., Garcia, L. Y., \& Salardini, A. (2025). Data leakage in deep learning for Alzheimer's disease diagnosis: A scoping review of methodological rigor and performance inflation. \textit{Diagnostics, 15}(18), 2348. https://doi.org/10.3390/diagnostics15182348
-\item Wen, J., Thibeau-Sutre, E., Diaz-Melo, M., Samper-Gonzalez, J., Routier, A., Bottani, S., \& Colliot, O. (2020). Convolutional neural networks for classification of Alzheimer's disease: Overview and reproducible evaluation. \textit{Medical Image Analysis, 63}, 101694. https://doi.org/10.1016/j.media.2020.101694
-\item Yuan, C., Linn, K. A., \& Hubbard, R. A. (2023). Algorithmic fairness of machine learning models for Alzheimer disease progression. \textit{JAMA Network Open, 6}(11), e2342203.
+\item Wen, J., Thibeau-Sutre, E., Diaz-Melo, M., Samper-Gonzalez, J., Routier, A., Bottani, S., Dormont, D., Durrleman, S., Burgos, N., \& Colliot, O. (2020). Convolutional neural networks for classification of Alzheimer's disease: Overview and reproducible evaluation. \textit{Medical Image Analysis, 63}, 101694. https://doi.org/10.1016/j.media.2020.101694
+\item Yuan, C., Linn, K. A., \& Hubbard, R. A. (2023). Algorithmic fairness of machine learning models for Alzheimer disease progression. \textit{JAMA Network Open, 6}(11), e2342203. https://doi.org/10.1001/jamanetworkopen.2023.42203
 \item Benjamini, Y., \& Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. \textit{Journal of the Royal Statistical Society: Series B, 57}(1), 289--300.
 \item Vickers, A. J., \& Elkin, E. B. (2006). Decision curve analysis: A novel method for evaluating prediction models. \textit{Medical Decision Making, 26}(6), 565--574.
 \item Sensoy, M., Kaplan, L., \& Kandemir, M. (2018). Evidential deep learning to quantify classification uncertainty. In \textit{Advances in Neural Information Processing Systems, 31}.
