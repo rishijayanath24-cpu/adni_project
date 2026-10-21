@@ -204,14 +204,12 @@ new here is the use of these two established techniques as the comparison
 baseline against which adaptive policies are measured, which has not
 previously been done.
 
-\textbf{Methodological rigour.} Reported accuracies in this field are known
-to be inflated by data leakage. A scoping review of 44 AD deep-learning
-studies found that 68.2\% relied on ADNI and only 15.9\% performed any
-external validation [12], and splitting by slice rather than by subject can
-move reported accuracy by as much as 28 percentage points [12, 13]. Our protocol is designed
-against these failure modes. Fairness in AD prediction models has been
-examined for prediction accuracy [14], but not, to our knowledge, for
-acquisition decisions.
+\textbf{Methodological rigour.} Reported accuracies in this field are known to be inflated by data leakage:
+a scoping review of 44 AD deep-learning studies found that 68.2\% relied on ADNI and only 15.9\%
+performed any external validation [12], and splitting by slice rather than by subject can move accuracy by as
+much as 28 percentage points [12, 13]. Our protocol is designed against these failure modes. Fairness in AD
+prediction models has been examined for prediction accuracy [14], but not, to our knowledge, for acquisition
+decisions.
 
 \section{Proposed Work}
 Figure 1 summarises the evaluation pipeline; Section 3.5 describes the
@@ -362,7 +360,7 @@ mechanism rather than a reproduction of the original numbers. Table 3 and
 Figure 3 show one representative configuration of each policy: the
 uncertainty cascade at a target escalation of 53.8\%, the staged evidential method's full
 ladder with the shared predictor, and the RL policy at cost weight 0.01. The
-calibration, decision-curve and fairness analyses (Figures 7 and 11) use the
+calibration, decision-curve and fairness analyses (Supplementary Figures S1 and S2) use the
 RL policy at cost weight 0.05.
 
 \begin{table}[!htbp]
@@ -444,7 +442,7 @@ were fixed in advance and were not chosen using the test set.
 
 \begin{figure}[!tbp]
 \centering
-\includegraphics[width=0.86\textwidth]{fig_algorithm_flow.png}
+\includegraphics[width=0.72\textwidth]{fig_algorithm_flow.png}
 \par\vspace{5pt}
 \textbf{Figure 2.} The proposed SPFA procedure: training (top) and
 inference for one patient (bottom).
@@ -486,35 +484,20 @@ Differences between policies are assessed by paired bootstrap on pooled
 out-of-fold predictions for the same subjects (1,000 resamples of subjects,
 two-sided 95\% percentile intervals; a difference is called significant when
 the interval excludes zero), which is considerably more sensitive than
-comparing independent confidence intervals. Each policy is compared with
-\emph{random acquisition at the same expected cost}: for a policy whose mean
-cost is $c$ under a given cost regime, the reference is random acquisition
-at rate $c$ divided by the cost of acquiring all four modalities, averaged
-over 50 seeds and scored on the same subjects and the same cross-validation
-folds. The paired difference carries a 95\% percentile interval and a two-sided
-bootstrap $p$-value from 10,000 subject resamples (the $p$-value is
-$(k+1)/(B+1)$, so it cannot fall below $10^{-4}$). The \emph{comparison
-family} is the 13 policies that differ from random acquisition at their own
-cost, within each horizon and cost regime: the nine published configurations,
-fixed MRI, fixed MRI+FDG and the two SPFA operating points. Cheap-only and
-acquire-all are excluded, since random acquisition at rate 0 and 1 is
-identical to them. Holm adjustment is applied within each family of 13. We
-report the unadjusted interval and the Holm-adjusted $p$-value separately and
-call a difference \emph{significant after adjustment} only when the adjusted
-$p<0.05$; ``significant'' without qualification never refers to the unadjusted
-interval. Comparisons with acquire-all are paired bootstrap intervals without
-adjustment and are descriptive.
+comparing independent confidence intervals. Each policy is compared with \emph{random acquisition at the same expected cost}: for a policy whose mean
+cost under a given regime is $c$, the reference is random acquisition at rate $c$ divided by the cost of
+acquiring all four modalities (50 seeds, same subjects and folds). Differences carry a 95\% percentile
+interval and a two-sided bootstrap $p$-value from 10,000 subject resamples ($p=(k+1)/(B+1)$). The
+\emph{comparison family} is the 13 policies that differ from random acquisition at their own cost within each
+horizon and regime (nine published configurations, fixed MRI, fixed MRI+FDG and two SPFA points; cheap-only
+and acquire-all are identical to random at rate 0 and 1 and are excluded), Holm-adjusted within each family.
+Unadjusted intervals and adjusted $p$-values are reported separately, and ``significant after adjustment''
+means adjusted $p<0.05$. Comparisons with acquire-all are unadjusted and descriptive.
 
-The matching is by \emph{expected} cost, not a strict fixed budget. Random
-acquisition draws a different cost for every patient, so a policy whose mean
-cost is $c$ is compared with random acquisition whose mean cost over 50 seeds
-is within 0.03, 0.01 and 0.05 units of $c$ (price-like, flat, burden; largest
-deviation over all policies and horizons), and whose seed-to-seed SD of mean
-cost is at most 0.23 units. Per-patient cost varies: at the matched rate its
-SD is 0.6 to 2.8 units under price-like costs, against 0.5 to 3.0 for the
-adaptive policies at their own cost, so the two spend with comparable spread.
-The same procedure is applied separately under each regime, with that regime's
-cost weights and its own matched rate. Acquisition-rate
+The match is on \emph{expected} cost, not a strict budget. Matched random's mean cost over seeds is within
+0.03, 0.01 and 0.05 units of the policy's (price-like, flat, burden; worst case), with a seed-to-seed SD of at
+most 0.23. Per-patient cost SD is 0.6 to 2.8 units for matched random against 0.5 to 3.0 for the adaptive
+policies (price-like), and the same procedure is applied separately under each regime. Acquisition-rate
 disparities are tested with a bootstrap over subgroups and corrected for
 multiplicity using the Benjamini-Hochberg procedure [16]; with dozens of
 (policy, modality) comparisons, uncorrected significance is not evidence.
@@ -539,30 +522,19 @@ single draw of one random policy can therefore land well above or below the
 mean, which is why a single-rate, single-seed baseline is not informative.)
 
 Compared with random acquisition at the same expected cost, \textbf{adaptive
-selection gave no consistent gain}. We report unadjusted and Holm-adjusted
-results separately (Section 3.6). Of the 27 configuration-horizon pairs for
-the published policies under price-like costs, \emph{unadjusted}, 22 had a
-paired 95\% interval including zero, 2 were better and 3 were worse.
-\emph{After Holm adjustment}, 25 of 27 showed no significant difference: one
-was better (the RL policy at cost weight 0.05 at 12 months, AUC +0.040, 95\%
-CI +0.016 to +0.066, adjusted $p=0.014$, which did not recur at 24 or 36
-months) and one was worse (the staged evidential method's full ladder with
-its own neural predictor at 12 months, $-0.169$, adjusted $p=0.003$). The
-other three unadjusted differences did not survive adjustment: losses of the
-evidential method's MRI-then-amyloid variant with its own predictor at 12 and
-24 months (adjusted $p=0.11$ and $0.10$) and a gain of the 25\%-escalation
-uncertainty cascade at 36 months (+0.028, 95\% CI +0.002 to +0.053, adjusted
-$p=0.37$). All three unadjusted losses were evidential variants using that
-method's own neural predictor, which is weaker than logistic regression at
-this sample size (Section 3.4).
-Under flat costs, 1 pair was better and 3 worse unadjusted, and after
-adjustment none was better and one worse (the same evidential full ladder);
-the RL gain at 12 months is not significant after adjustment under flat costs
-(adjusted $p=0.079$). Under burden costs, 4 were better and 2 worse
-unadjusted, and after adjustment 2 were better (the same RL gain, adjusted
-$p=0.026$, and the 25\%-escalation cascade at 36 months, adjusted $p=0.035$)
-and one worse. The gains therefore depend on the cost regime, and neither
-recurs across horizons.
+selection gave no consistent gain} (unadjusted and Holm-adjusted results are reported separately; Section
+3.6). Of the 27 published-policy pairs under price-like costs, unadjusted, 22 had an interval including zero,
+2 were better and 3 worse. After Holm adjustment 25 of 27 showed no significant difference: one was better
+(RL, cost weight 0.05, 12 months: +0.040, 95\% CI +0.016 to +0.066, adjusted $p=0.014$; not repeated at 24
+or 36 months) and one worse (staged evidential full ladder with its own neural predictor, 12 months:
+$-0.169$, adjusted $p=0.003$). The other three unadjusted differences did not survive adjustment: two losses
+of the evidential MRI-then-amyloid variant with its own predictor (adjusted $p=0.11$ and $0.10$) and a gain
+of the 25\%-escalation cascade at 36 months (+0.028, adjusted $p=0.37$). All unadjusted losses used the
+evidential method's own neural predictor, which is weaker than logistic regression at this sample size
+(Section 3.4). Under flat costs none was better and one worse after adjustment (the same evidential ladder;
+the RL gain has adjusted $p=0.079$). Under burden costs two were better (the RL gain, adjusted $p=0.026$,
+and the 25\%-escalation cascade at 36 months, adjusted $p=0.035$) and one worse. The gains depend on the
+cost regime and neither recurs across horizons.
 
 The reference rules tell a different story. At their own cost, fixed MRI and
 fixed MRI+FDG exceeded random acquisition at matched cost by +0.009 to +0.036
@@ -608,7 +580,7 @@ acquire-all & 9.50 & 0.862 & 0.893 & 0.898 \\\hline
 
 \begin{figure}[!tbp]
 \centering
-\includegraphics[width=\textwidth]{fig1_cost_accuracy_frontier.png}
+\includegraphics[width=0.9\textwidth]{fig1_cost_accuracy_frontier.png}
 \par\vspace{5pt}
 \textbf{Figure 3.} Cost-AUC frontier at each prediction horizon
 (development set, cross-validated). The dashed line marks the AUC reached by
@@ -624,7 +596,7 @@ the reference rules (circles); Section 4.2 counts how many are dominated.
 
 \begin{figure}[!tbp]
 \centering
-\includegraphics[width=\textwidth]{fig_random_sweep.png}
+\includegraphics[width=0.9\textwidth]{fig_random_sweep.png}
 \par\vspace{5pt}
 \textbf{Figure 4.} Cost-matched random baseline. The grey line is the AUC of
 random acquisition (each modality acquired independently with the rate
@@ -659,7 +631,7 @@ the count under each cost regime.
 
 \begin{figure}[!tbp]
 \centering
-\includegraphics[width=\textwidth]{fig4_acquisition_domination.png}
+\includegraphics[width=0.9\textwidth]{fig4_acquisition_domination.png}
 \par\vspace{3pt}
 \textbf{Figure 5.} (a) Expected number of modalities acquired per patient by
 each policy in the 24-month benchmark, split by modality. (b) Number of the
@@ -685,48 +657,26 @@ uncertainty cascade and RL at cost weight 0.05) were dominated, and the
 staged evidential method was not (0.868 at cost 4.6, against 0.855 for fixed
 MRI+FDG at 3.0 and 0.881 for acquire-all at 9.5).
 Gradient boosting lowered AUC for every policy, by 0.010 (evidential) to
-0.055 (RL) and by 0.031 for fixed MRI+FDG (Figure 6b), so logistic regression
+0.055 (RL) and by 0.031 for fixed MRI+FDG (Supplementary Figure S4b), so logistic regression
 was the stronger predictor at this sample size. Across random seeds 0, 7 and
-42, per-policy AUC standard deviations (SDs) were 0.004--0.014 (Figure 6a);
+42, per-policy AUC standard deviations (SDs) were 0.004--0.014 (Supplementary Figure S4a);
 the ranking shifted between seeds, but acquire-all ranked first and fixed MRI
 and cheap-only last at every seed, and the best published policy ranked
 second at one seed and below fixed MRI+FDG at the other two.
 
 
-\begin{figure}[!tbp]
-\centering
-\includegraphics[width=\textwidth]{fig5_robustness.png}
-\par\vspace{3pt}
-\textbf{Figure 6.} (a) Seed robustness at 24 months: dots are seeds 0, 7
-and 42; the bar is mean $\pm$ SD. (b) AUC under the shared logistic
-regression and under gradient boosting on the same 366-subject cohort (seed
-42). Both panels use the 12-measure MRI block.
-\end{figure}
-
-Decision-curve analysis extended the comparison to clinical utility
-(Figure 7a). Every strategy delivered a clear net benefit over treating
-everyone at thresholds of 0.10 and above, and no published policy led
-consistently: the highest net benefit came from acquire-all at four of the
-ten thresholds (0.05, 0.15, 0.20 and 0.30), fixed MRI+FDG at 0.10, the
-uncertainty cascade at 0.25, and SPFA with MRI+FDG at 0.35--0.50. Where a
-published policy exceeded the best reference strategy (thresholds 0.25, 0.35
-and 0.40) it did so by at most 0.005. Calibration slopes did not favour the
-published policies either: cheap-only was the best calibrated reference
-(slope 0.828), random acquisition scored 0.780, the three published policies
-ranged from 0.733 to 0.756, and acquire-all was the worst (0.725); SPFA was
-closest to ideal (1.080 and 1.104). Figure 7b shows reliability curves for
-the reference strategies and SPFA.
 
 
-\begin{figure}[!tbp]
-\centering
-\includegraphics[width=\textwidth]{fig6_clinical_utility.png}
-\par\vspace{3pt}
-\textbf{Figure 7.} (a) Net benefit across threshold probabilities in the
-24-month benchmark, with treat-all and treat-none references (RL policy not
-shown, for legibility). (b) Reliability diagram: mean predicted risk against
-observed conversion rate within risk bins.
-\end{figure}
+Decision-curve analysis (Supplementary Figure S1a) showed a clear net benefit over treating everyone at
+thresholds of 0.10 and above for every strategy, and no published policy led consistently: the highest net
+benefit came from acquire-all at four of the ten thresholds, fixed MRI+FDG at 0.10, the uncertainty cascade at
+0.25 and SPFA with MRI+FDG at 0.35--0.50, and where a published policy beat the best reference (thresholds
+0.25, 0.35 and 0.40) it did so by at most 0.005. Calibration slopes did not favour the published policies
+either (0.733 to 0.756, against 0.828 for cheap-only, 0.780 for random and 0.725 for acquire-all); SPFA was
+closest to ideal (1.080 and 1.104; Supplementary Figure S1b).
+
+
+
 
 \subsection{The proposed configuration (SPFA)}
 If the savings these policies chase do not require a policy, they should be
@@ -785,7 +735,7 @@ survived adjustment. The adjustment
 matters: the strongest claim these data support is for the MRI-only operating
 point, with the MRI+FDG point suggestive.
 
-An ablation separates the two ingredients (Figure 8), relative to the
+An ablation separates the two ingredients (Figure 6), relative to the
 three-feature block trained on complete cases. At the 24-month horizon, the
 combination improves the MRI-only state by +0.034 AUC
 (95\% CI +0.007 to +0.063). Pooled training alone gives +0.019 (+0.004 to
@@ -803,9 +753,9 @@ months (95\% CI +0.001 to +0.042), significant only at the margin.
 
 \begin{figure}[!tbp]
 \centering
-\includegraphics[width=\textwidth]{fig7_ablation.png}
+\includegraphics[width=0.9\textwidth]{fig7_ablation.png}
 \par\vspace{3pt}
-\textbf{Figure 8.} (a) Cross-validated AUC at each acquisition state for
+\textbf{Figure 6.} (a) Cross-validated AUC at each acquisition state for
 the three-feature and the expanded MRI block, each with and without pooled
 training, at 24 months (95\% CI). (b) Paired change in AUC relative to the
 three-feature, complete-case reference for each ingredient alone and both
@@ -818,13 +768,13 @@ against acquire-all's 0.928, 0.922 and 0.944. Paired against acquire-all,
 neither SPFA operating point was significantly worse at any horizon. The
 weakest case is MRI-only at 36 months ($-0.089$, 95\% CI $-0.186$ to
 $+0.000$), where the upper limit sits at zero to three decimals; this weakness was visible in development and is reported
-rather than rounded away (Figure 9).
+rather than rounded away (Figure 7).
 
 \begin{figure}[!tbp]
 \centering
 \includegraphics[width=0.86\textwidth]{fig_final_test_forest.png}
 \par\vspace{5pt}
-\textbf{Figure 9.} Held-out test AUC with 95\% bootstrap CI for the proposed
+\textbf{Figure 7.} Held-out test AUC with 95\% bootstrap CI for the proposed
 SPFA operating points (``ours''), fixed MRI+FDG (expanded MRI block,
 complete-case training), cheap-only and acquire-all, at the 12-, 24- and 36-month horizons. Intervals
 overlap throughout because the test sets contain only 9, 17 and 22 converters.
@@ -838,33 +788,23 @@ MRI-only at 36 months. For the two SPFA operating points, test AUC differed
 from the nested development estimate by $-0.005$ to $+0.072$ (largest for
 MRI-only at 12 months: 0.944 against 0.872), and the 12-month test set
 appears easier overall: all five models scored 0.066 to 0.099 above their
-development estimates, including cheap-only (+0.099). Two post hoc,
-descriptive checks (nothing was tuned on them) put this in context. First, we
-drew 20,000 random subsets of the development out-of-fold predictions with
-the same size and number of converters as each test set. The standard
-deviation of AUC across such subsets is 0.04--0.06 at 12 months and
-0.03--0.05 at 24 and 36 months, and the observed 12-month test AUCs fall at
-the 92nd to 99th percentile of that distribution (24 and 36 months: 41st to
-95th, with acquire-all at 36 months the highest at 94.5th); the five models
-share the same test subjects, so these percentiles are not independent. A
-12-month gap of this size is therefore unusual but not implausible for nine
-converters. Second, test and development subjects were similar at baseline:
-standardised mean differences in age, education, MMSE, CDR-SB, APOE4 and
-hippocampal and ventricular volume were at most 0.23 in magnitude, and
-outcome prevalence matched (9.0\% against 8.9\%, 18.3\% against 18.5\%, and
-25.7\% against 26.2\% at 12, 24 and 36 months). We therefore attribute the
-differences to small-sample variation rather than a real gain, but cannot
-exclude other causes; the nested figures in Table 4 are the ones to quote as
-expected performance. As a check on leakage, test subjects are excluded from
-the training pool by construction and the split asserts that no subject
-appears in two partitions; operating points, feature blocks and the
-regularisation grid were fixed before the test set was scored, and it was
-scored at the end on two releases (Section 3.2).
+development estimates, including cheap-only (+0.099). Two post hoc, descriptive checks (nothing was tuned on them) put this in context. First, 20,000 random subsets
+of the development out-of-fold predictions with each test set's size and number of converters have an AUC
+standard deviation of 0.04--0.06 at 12 months and 0.03--0.05 at 24 and 36; the 12-month test AUCs fall at the
+92nd to 99th percentile of that distribution (24 and 36 months: 41st to 95th), and since the five models
+share test subjects these percentiles are not independent. Second, test and development subjects were
+similar at baseline (standardised mean differences in age, education, MMSE, CDR-SB, APOE4 and hippocampal
+and ventricular volume at most 0.23; outcome prevalence 9.0\% against 8.9\%, 18.3\% against 18.5\% and
+25.7\% against 26.2\%). We therefore attribute the differences to small-sample variation rather than a
+real gain, but cannot exclude other causes; the nested figures in Table 4 are the ones to quote as
+expected performance. Test subjects are excluded from the training pool by construction, the split asserts that no subject appears in
+two partitions, and operating points, feature blocks and the regularisation grid were fixed before the test
+set was scored.
 
 \subsection{Representation attrition and the limits of fairness auditing}
 The complete-case multimodal design this literature relies on has a
 demographic cost that is not usually reported. Table 6 traces it, and
-Figure 10a plots the same attrition alongside cohort size.
+Supplementary Figure S5a plots the same attrition alongside cohort size.
 
 \begin{table}[!htbp]
 \centering
@@ -888,15 +828,10 @@ recent phase (ADNI4) is 38.8\% non-White, against 6.3--9.4\% in ADNI1, ADNI-GO
 and ADNI2, a substantial recruitment improvement, but only 16.3\% of its
 participants yet have 24-month follow-up (48--87\% in earlier phases). ADNI's diversity gains are
 therefore structurally invisible to conversion-prediction studies at
-present. Figure 10b shows how thin the non-White strata are in the audit
+present. Supplementary Figure S5b shows how thin the non-White strata are in the audit
 cohort itself.
 
-\begin{figure}[!tbp]
-\centering
-\includegraphics[width=\textwidth]{fig9_attrition.png}
-\par\vspace{3pt}
-\textbf{Figure 10.} (a) Cohort size (blue bars, left axis) and non-White representation (orange line, right axis) at each stage of complete-case cohort construction, 24 months. (b) Participants by self-reported race in the 24-month audit cohort; grey bars mark groups too small for stratified inference.
-\end{figure}
+
 
 The practical consequence is that a race-stratified fairness audit of these
 policies is not currently feasible: the 366-participant audit cohort
@@ -911,69 +846,35 @@ $p=0.050$ uncorrected -- the evidential method ordering FDG-PET 10.0
 percentage points less often for male participants, and the RL policy (cost
 weight 0.05) ordering 0.23 more modalities per male participant -- but
 neither survived Benjamini-Hochberg across the comparison family, and they are
-reported as suggestive only (Figure 11). We note that fixed policies cannot
+reported as suggestive only (Supplementary Figure S2). We note that fixed policies cannot
 exhibit acquisition disparity at all, since they do not consult the patient.
 
-\begin{figure}[!tbp]
-\centering
-\includegraphics[width=\textwidth]{fig_sex_acquisition.png}
-\par\vspace{5pt}
-\textbf{Figure 11.} Acquisition rate by modality and sex for the three
-published policies at 24 months (RL policy at cost weight 0.05; male $n=213$,
-female $n=153$). No gap survived Benjamini-Hochberg correction.
-\vspace{10pt}
-\end{figure}
+
 
 \subsection{Horizon dependence}
-A secondary analysis asked whether modality value depends on the prediction
-horizon, which would motivate horizon-conditioned policies. This analysis
-uses the same 12-measure MRI block as the main benchmark. On a fixed subject
-set, amyloid-PET and CSF showed a significant increase in incremental value
-from 12 to 36 months (+0.049, 95\% CI +0.021 to +0.080, and +0.040, 95\% CI
-+0.010 to +0.068); MRI and FDG did not (tau-PET, flagged underpowered, also
-increased). A horizon-conditioned policy built on this effect did not
-outperform horizon-swapped controls, indicating the effect is real as a
-measurement but not exploitable as an acquisition rule at this sample size.
-Figure 12 shows the incremental value of each modality by horizon (a) and on
-subjects matched to each modality, including all four together (b).
-
-
-\begin{figure}[!tbp]
-\centering
-\includegraphics[width=\textwidth]{fig11_horizon.png}
-\par\vspace{3pt}
-\textbf{Figure 12.} (a) Incremental AUC of each modality over the cheap-only model at 12, 24 and 36 months on a fixed subject set (95\% CI); tau-PET omitted as underpowered. (b) The same quantity on subjects matched to each modality; the
-all-four estimate rises from +0.047 at 12 months to +0.121 at 36 months. Both
-panels use the 12-measure MRI block.
-\end{figure}
+A secondary analysis asked whether modality value depends on the prediction horizon, which would motivate
+horizon-conditioned policies. It uses the same 12-measure MRI block. On a fixed subject set, amyloid-PET and CSF
+showed a significant increase in incremental value from 12 to 36 months (+0.049, 95\% CI +0.021 to +0.080, and
++0.040, 95\% CI +0.010 to +0.068); MRI and FDG did not (tau-PET, flagged underpowered, also increased). A
+horizon-conditioned policy built on this effect did not outperform horizon-swapped controls: the effect is real
+as a measurement but not exploitable as an acquisition rule at this sample size (Supplementary Figure S3).
 
 
 \subsection{Limitations}
-The three policies are re-implementations from published descriptions, as
-no public code exists for any of them; a negative result about a
-re-implementation is weaker evidence than one about original code, and we
-state this plainly. Sample sizes are modest -- 67 converters in the
-24-month development cohort and 17 in its test set -- so several
-non-significant comparisons are underpowered, and ``not distinguishable''
-should not be read as ``equivalent''. Random acquisition is matched to each policy
-by expected cost, not as a strict fixed budget: the matched rate is derived
-from the policy's mean cost, and a policy's per-patient cost can differ from
-random acquisition's even when the means agree (Section 3.6). Comparisons
-against cost-matched random are Holm-adjusted within each horizon and cost
-regime (families of 13), but not across horizons and regimes together, and
-comparisons against acquire-all are unadjusted. In the
-proposed configuration, different acquisition states are fitted on different,
-overlapping subject sets, so part of the gain may reflect which subjects
-each state was trained on, and one FreeSurfer table treats a month-3 scan as
-baseline-equivalent. The held-out test set was scored on two ADNI data
-releases (Section 3.2) with unchanged code, so it cannot be treated as
-untouched with respect to the first. Acquisition costs are relative units
-whose absolute values are contestable, which is why every cost-dependent
-conclusion is reported across three regimes. ADNI's missingness is
-protocol-driven rather than random, so any retrospective estimate of what
-could have been skipped is a simulation and not a prospective guarantee.
-MRI morphometry pools several FreeSurfer pipeline versions, and the results
-come from a single cohort without external validation.
+The three policies are re-implementations from published descriptions, as no public code exists for any of
+them, so a negative result is weaker evidence than one about original code. Sample sizes are modest (67
+converters in the 24-month development cohort, 17 in its test set), so several non-significant comparisons are
+underpowered and ``not distinguishable'' should not be read as ``equivalent''. Random acquisition is matched by
+expected cost, not as a strict fixed budget, and per-patient cost can differ from random's even when the means
+agree (Section 3.6). Comparisons against cost-matched random are Holm-adjusted within each horizon and regime
+(families of 13) but not across them, and comparisons against acquire-all are unadjusted. In SPFA, different
+acquisition states are fitted on different, overlapping subject sets, so part of the gain may reflect which
+subjects each state was trained on, and one FreeSurfer table treats a month-3 scan as baseline-equivalent. The
+held-out test set was scored on two ADNI data releases (Section 3.2) and so is not untouched with respect to
+the first. Acquisition costs are relative units whose absolute values are contestable, hence the three
+regimes. ADNI's missingness is protocol-driven rather than random, so retrospective estimates of what could
+have been skipped are simulations, not prospective guarantees. MRI morphometry pools several FreeSurfer
+pipeline versions, and the results come from a single cohort without external validation.
 
 \section{Conclusion}
 Three published adaptive modality-acquisition policies for Alzheimer's
@@ -1026,7 +927,7 @@ accordance with the ADNI Data Use Agreement.
 The authors declare no conflicts of interest.
 
 \section*{\fontsize{12}{12}\selectfont\textbf{Acknowledgement}}
-{\small Data collection and sharing for this project was funded by the Alzheimer's
+{\footnotesize Data collection and sharing for this project was funded by the Alzheimer's
 Disease Neuroimaging Initiative (ADNI) (National Institutes of Health Grant
 U01 AG024904) and DOD ADNI (Department of Defense award number
 W81XWH-12-2-0012). ADNI is funded by the National Institute on Aging, the

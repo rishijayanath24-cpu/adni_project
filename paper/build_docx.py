@@ -689,9 +689,9 @@ TABLE_WIDTHS = {  # cm; chosen to fill the 15.9 cm text width
     5: [3.9, 4.0, 4.0, 4.0],
     6: [6.8, 2.2, 3.4, 3.4],
 }
-DEFAULT_MAX_W = 15.9
+DEFAULT_MAX_W = 14.3
 FIG_DEFER = {2: 2, 8: 1, 1: 2, 9: 1}          # figure number -> number of body paragraphs to place before it
-IMG_MAX_W = {"fig_algorithm_flow.png": 14.6, 
+IMG_MAX_W = {"fig_algorithm_flow.png": 11.5, 
              "fig_final_test_forest.png": 14.6}
 
 
