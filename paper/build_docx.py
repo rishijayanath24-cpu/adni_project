@@ -415,17 +415,16 @@ class Builder:
     def title_block(self, title):
         p = self.para(None, AL.CENTER, after=24)
         self._rfonts(p.add_run(re.sub(r"\s+", " ", title).replace("'", "\u2019")), 24, True)
-        names = [("Rishi Jayanath A", "1"), ("Adwaith Sajikumar", "1"), ("G.\u00a0Naveen\u00a0Sundar", "2"), ("D.\u00a0Narmadha", "3")]
+        names = [("Rishi Jayanath A", "1"), ("Adwaith Sajikumar", "1"), ("G.\u00a0Naveen\u00a0Sundar", "1,*"), ("D.\u00a0Narmadha", "2")]
         p = self.para(None, None, after=6)
         for k, (n, a) in enumerate(names):
             self._rfonts(p.add_run(n), 16, True)
             self._rfonts(p.add_run(a), 16, True, sup=True)
             self._rfonts(p.add_run(", "), 16, True)
         self._rfonts(p.add_run("for the Alzheimer\u2019s Disease Neuroimaging Initiative"), 16, True)
-        self._rfonts(p.add_run("*"), 16, True, sup=True)
-        affs = [("1", "Department of Computer Science and Engineering, Karunya Institute of Technology and Sciences, Coimbatore, India"),
-                ("2", "Division of Computer Science and Engineering, Karunya Institute of Technology and Sciences, Coimbatore, Tamil Nadu, India"),
-                ("3", "Division of AIML, Karunya Institute of Technology and Sciences, Coimbatore, Tamil Nadu, India")]
+        self._rfonts(p.add_run("†"), 16, True, sup=True)
+        affs = [("1", "Division of Computer Science and Engineering, Karunya Institute of Technology and Sciences, Coimbatore, Tamil Nadu, India"),
+                ("2", "Division of AIML, Karunya Institute of Technology and Sciences, Coimbatore, Tamil Nadu, India")]
         for k, (n, t) in enumerate(affs):
             p = self.para(None, AL.JUSTIFY, after=8 if k == len(affs) - 1 else 0, line=1.08)
             self._rfonts(p.add_run(n), 11, sup=True)
@@ -433,13 +432,16 @@ class Builder:
         p = self.para(None, AL.LEFT, line=1.0)
         self._rfonts(p.add_run("E-mail: "), 9, True)
         mails = [("1", "rishijayanath@karunya.edu.in"), ("1", "adwaithsajikumar@karunya.edu.in"),
-                 ("2", "naveensundar@karunya.edu"), ("3", "narmadha@karunya.edu")]
+                 ("1,*", "naveensundar@karunya.edu"), ("2", "narmadha@karunya.edu")]
         for k, (n, m) in enumerate(mails):
             self._rfonts(p.add_run(n), 9, sup=True)
             self._rfonts(p.add_run(m), 9)
             if k < len(mails) - 1:
                 self._rfonts(p.add_run(", "), 9)
-        note = ("*Data used in preparation of this article were obtained from the Alzheimer\u2019s Disease "
+        c = self.para(None, AL.LEFT, before=2, line=1.0)
+        self._rfonts(c.add_run("*"), 9, sup=True)
+        self._rfonts(c.add_run("Corresponding author: G. Naveen Sundar (naveensundar@karunya.edu)"), 9)
+        note = ("†Data used in preparation of this article were obtained from the Alzheimer\u2019s Disease "
                 "Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the investigators within "
                 "the ADNI contributed to the design and implementation of ADNI and/or provided data but did not "
                 "participate in analysis or writing of this report. A complete listing of ADNI investigators can "
