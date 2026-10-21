@@ -11,9 +11,13 @@ PREDICTIVE UNCERTAINTY per patient, and escalate only the uncertain
 patients to a second-stage model that also uses the expensive modality.
 Certain patients are answered by stage one and never scanned.
 
-Published reference numbers (ADNI, MCI conversion): n = 1,319 with T1-MRI
-of whom 612 also had amyloid-PET; AUC 0.851; 46.2% of patients answered by
-the MRI-only model and 53.8% escalated to MRI+PET.
+Reference numbers: n = 1,319 with T1-MRI of whom 612 also had amyloid-PET;
+AUC 0.851; 46.2% of patients answered by the MRI-only model and 53.8%
+escalated to MRI+PET. NOTE (Oct 2026 check): these figures could NOT be found
+in the IISE Trans. Healthcare Syst. Eng. 2024 paper (its operating points are
+AUC 0.880 at 77% PET saved and 0.866 at 91% saved); their source is
+unverified. The 0.538 escalation rate is used here only as one operating point
+of the cascade, and the manuscript does not attribute it to the paper.
 
 DELIBERATE ADAPTATIONS, stated rather than buried:
   * Stage one here is CHEAP+MRI, not MRI alone. Demographics, cognition and

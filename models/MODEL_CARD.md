@@ -26,26 +26,32 @@ at the patient when deciding.
 ## Performance (nested cross-validation, honest)
 Nested CV re-selects the regularisation strength inside every outer fold, so
 these figures are not the ones anything was tuned on. Selection optimism was
-measured at +0.0008 AUC on average.
+measured at +0.0016 AUC on average.
 
 | horizon | ours_MRI (cost 1.0) | ours_MRI+FDG (cost 3.0) | acquire-all (cost 9.5) |
 |---|---|---|---|
-| 12 mo | 0.873 | **0.885** | 0.863 |
-| 24 mo | 0.884 | **0.896** | 0.894 |
-| 36 mo | 0.864 | 0.888 | 0.900 |
+| 12 mo | 0.872 | **0.885** | 0.862 |
+| 24 mo | 0.883 | **0.897** | 0.893 |
+| 36 mo | 0.860 | 0.885 | 0.898 |
 
 At cost 3.0, accuracy matches or exceeds acquiring all four modalities at
-cost 9.5 at two of three horizons, and is 0.012 below at 36 months.
+cost 9.5 at two of three horizons (36 mo: 0.013 below, not significant).
+Compared with random acquisition at the same cost, ours_MRI is better by
++0.056 (24 mo) and +0.046 (36 mo) AUC, Holm-adjusted p = 0.010 and 0.016;
+ours_MRI+FDG is better nominally but not after adjustment.
 
-**The held-out test set has NOT been used.** These are development-set
-figures. Run `src/eval/run_final_test.py --i-am-sure` once, when the
-analysis is final, for the confirmatory number.
+**Held-out test (scored on two ADNI releases, so not untouched; Oct 2026
+results):** ours_MRI 0.944 / 0.908 / 0.855, ours_MRI+FDG 0.951 / 0.901 /
+0.903, acquire-all 0.928 / 0.922 / 0.944 at 12 / 24 / 36 months. The test
+sets hold only 9 / 17 / 22 converters, so this does not establish
+equivalence with acquire-all (see `paper/` and `models/TEST_SET_SPENT.json`).
+Quote the nested figures above as expected performance.
 
 ## Training data
 ADNI, MCI at baseline. Every labelled subject outside the locked test set,
 including subjects missing some modalities — each acquisition state is
 fitted on everyone holding that state rather than on complete cases only
-(559–910 subjects per model, versus 333–402 under complete-case fitting).
+(563–988 subjects per model, versus 334–402 under complete-case fitting).
 
 ## Features
 Cheap block: age, education, sex, APOE4 allele count, MMSE, CDR-SB.
@@ -57,9 +63,9 @@ FDG block: MetaROI SUVR.
 ## Limitations — read before using
 - **Not clinically validated.** Retrospective, single cohort, no prospective
   or external validation. Not a medical device.
-- **The cohort is 94% White.** ADNI's recent diversity gains (ADNI4 is 49.8%
-  non-White) are invisible here because only 1.7% of ADNI4 has 24-month
-  follow-up. Performance in under-represented groups is unmeasured, not
+- **The cohort is 94% White.** ADNI's recent diversity gains (among MCI
+  participants ADNI4 is 38.8% non-White) are invisible here because only
+  16.3% of ADNI4 has a 24-month label. Performance in under-represented groups is unmeasured, not
   demonstrated to be equal.
 - **Cost units are relative and contestable**, not dollars. Conclusions were
   checked under three cost regimes; the dominance result is regime-dependent

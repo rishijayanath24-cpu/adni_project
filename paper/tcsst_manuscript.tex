@@ -11,8 +11,23 @@
 \usepackage{mathptmx}
 \usepackage{setspace}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{1em}
+\setlength{\parskip}{10pt}
 \sloppy
+\raggedbottom
+\widowpenalty=10000
+\clubpenalty=10000
+\renewcommand{\arraystretch}{1.0}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{totalnumber}{4}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{array}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
@@ -41,41 +56,54 @@
 {A Cost-Matched Benchmark of Adaptive Modality Acquisition for Alzheimer's Disease Prognosis on ADNI}
 \end{center}
 \vspace{24pt}
-\fontsize{16}{16}\selectfont\textbf{
-Rishi Jayanath$^1$}
+\fontsize{16}{16}\selectfont\noindent\textbf{%
+Rishi Jayanath A$^1$, Adwaith Sajikumar$^1$,\\
+G. Naveen Sundar$^2$, D. Narmadha$^3$,\\
+for the Alzheimer's Disease Neuroimaging Initiative$^\ast$}
 \vspace{16pt}\\
-\fontsize{11}{11}\selectfont {
-$^1$[Department], [Institution], [City], [Country]
+\fontsize{11}{13}\selectfont {
+$^1$Department of Computer Science and Engineering, Karunya Institute of Technology and Sciences, Coimbatore, India\\
+$^2$Division of Computer Science and Engineering, Karunya Institute of Technology and Sciences, Coimbatore, Tamil Nadu, India\\
+$^3$Division of AIML, Karunya Institute of Technology and Sciences, Coimbatore, Tamil Nadu, India
 }\vspace{16pt}\\
-{\fontsize{9}{9}\selectfont\textbf{{E-mail:}} $^1$rishi.jayanath@roboticsforyouth.org}\\
+{\fontsize{9}{11}\selectfont\textbf{{E-mail:}} $^1$rishijayanath@karunya.edu.in, $^1$adwaithsajikumar@karunya.edu.in,\\
+$^2$naveensundar@karunya.edu, $^3$narmadha@karunya.edu}\\[6pt]
+{\fontsize{9}{11}\selectfont $^\ast$Data used in preparation of this article were obtained from the
+Alzheimer's Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As such, the
+investigators within the ADNI contributed to the design and implementation of ADNI and/or provided
+data but did not participate in analysis or writing of this report. A complete listing of ADNI
+investigators can be found at:
+http://adni.loni.usc.edu/wp-content/uploads/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf}
 \end{singlespace}
 
 \fontsize{12}{12}\selectfont
-\begin{onehalfspace}
+\begin{spacing}{1.0}
 
 \section*{Abstract}
 Adaptive modality-acquisition policies promise to cut the cost of
-Alzheimer's disease prognosis by deciding, per patient, which expensive
-scan to order. Several such policies report large reductions in imaging
-use at maintained accuracy, but they have not been compared against one
-another, nor against the trivial baselines that any cost-saving claim must
-beat. This study audits three published policies -- an uncertainty-gated
-cascade, a staged evidential method, and a reinforcement-learning test-ordering
-policy -- re-implemented under a single leakage-free protocol on 1,622
-Alzheimer's Disease Neuroimaging Initiative participants with mild cognitive
-impairment at baseline. Policies were evaluated at 12, 24 and 36-month
-prediction horizons, under three acquisition-cost regimes, with subject-level
-splits and a held-out test set spent once. No policy significantly
-outperformed random acquisition at any horizon, and 18 of 33 policy-horizon
-pairs were dominated by a patient-independent fixed rule costing no more.
-The result survived a predictor swap, a cost-regime sweep, seed variation
-and decision-curve analysis. A configuration using established
-Alzheimer's-signature structural features reached accuracy statistically
-indistinguishable from acquiring four modalities at one-third to one-ninth
-of the acquisition cost. Separately, complete-case multimodal analysis is
-shown to reduce non-White representation from 17.1\% to 5.9\%, making
-race-stratified fairness auditing of conversion models infeasible on current
-ADNI data.
+Alzheimer's disease prognosis by deciding, per patient, which scan to order,
+but to our knowledge none has been compared with the others or with the
+trivial baselines that any cost-saving claim must beat. We re-implemented
+three published policies (an uncertainty-gated cascade, a staged evidential
+method and a reinforcement-learning test-ordering policy) as nine
+configurations under one leakage-free protocol, using 1,566 participants with
+mild cognitive impairment from the Alzheimer's Disease Neuroimaging
+Initiative (ADNI) and conversion outcomes at 12, 24 and 36 months. Against
+random acquisition at the same expected cost, 25 of 27 configuration-horizon
+pairs showed no significant difference after Holm correction under price-like
+costs (one better, one worse), and 19 of 27 were dominated by a
+patient-independent fixed rule costing no more. A fixed rule using expanded
+structural magnetic resonance imaging (MRI) features and training on
+partially observed participants (signature-pooled fixed acquisition, SPFA)
+beat cost-matched random acquisition at its MRI-only operating point (area
+under the receiver operating characteristic curve, AUC, +0.056 and +0.046 at 24 and 36 months; Holm-adjusted
+$p=0.010$ and $0.016$) and showed no significant AUC difference from
+acquiring all four modalities at one-third to one-tenth of the cost, except
+for MRI-only at 36 months in development. The held-out test set, scored on
+two successive data releases (the second is reported), is small and cannot
+establish equivalence. Complete-case analysis reduced non-White
+representation from 14.2\% to 5.9\%, making race-stratified fairness
+auditing infeasible.
 
 \vspace{5pt}
 \textbf{\fontsize{12}{12}\selectfont Keywords:} Alzheimer's disease,
@@ -86,8 +114,10 @@ algorithmic fairness, mild cognitive impairment
 Predicting whether a person with mild cognitive impairment (MCI) will
 progress to Alzheimer's disease (AD) dementia is usually framed as a
 prediction problem: assemble as many modalities as possible -- structural
-MRI, FDG and amyloid PET, cerebrospinal fluid (CSF) assays -- and maximise
-discrimination. In a clinic, it is also an economics problem. Amyloid PET
+magnetic resonance imaging (MRI), fluorodeoxyglucose (FDG) and amyloid
+positron emission tomography (PET), and cerebrospinal fluid (CSF) assays --
+and maximise
+discrimination. In a clinic, it is also an economics problem. Amyloid-PET
 is expensive and exposes the patient to radiation; a lumbar puncture is
 invasive; MRI is comparatively cheap. Acquiring everything for everyone is
 neither affordable nor necessary.
@@ -98,15 +128,15 @@ escalating only the cases the cheaper data leaves uncertain. Published
 policies of this kind report substantial savings -- reductions of 50--90\%
 in imaging use at maintained accuracy are claimed [1, 2, 3].
 
-These claims have not been tested against each other, and more importantly
-they have not been tested against the baselines any cost-saving claim must
+To our knowledge these claims have not been tested against each other, and,
+more importantly, they have not been tested against the baselines any cost-saving claim must
 clear. Two are essential. The first is \emph{random} acquisition: if
 escalating a randomly chosen half of patients performs as well, the policy's
 decisions carry no information, only its willingness to spend. The second
 is a \emph{fixed} rule that acquires the same modalities for everyone: if a
 rule that never looks at the patient matches the policy at equal or lower
-cost, personalisation has bought nothing. Neither baseline appears in the
-original reports.
+cost, personalisation has bought nothing. To our knowledge, neither baseline
+appears in the original reports.
 
 This paper supplies that audit. The contributions are:
 
@@ -115,9 +145,11 @@ This paper supplies that audit. The contributions are:
 policies, re-implemented under one leakage-free protocol, across three
 prediction horizons and three acquisition-cost regimes, with paired
 statistical comparison against random and fixed baselines.
-\item A cost-domination analysis quantifying how often a learned policy is
-beaten by a patient-independent rule costing no more, and a robustness
-sweep over predictor family, cost regime and random seed.
+\item Random-acquisition baselines swept over acquisition rate and matched
+to each policy's expected cost, a cost-domination analysis quantifying how
+often a learned policy is beaten by a patient-independent rule costing no
+more, and a robustness sweep over predictor family, cost regime and random
+seed.
 \item A quantification of \emph{representation attrition}: the demographic
 cost of the complete-case multimodal designs this literature relies on,
 and its consequence for fairness auditing.
@@ -131,33 +163,35 @@ reproduce established results in a new setting.
 
 \textbf{Adaptive acquisition policies for AD.} Three published methods are
 audited here. Zheng et al. [1] gate amyloid-PET acquisition on the
-predictive uncertainty of an MRI model, reporting AUC 0.851 with 53.8\% of
-patients escalated. A staged evidential method [2] performs Dirichlet-based
+predictive uncertainty of an MRI model, reporting an area under the receiver
+operating characteristic curve (AUC) of 0.880 while saving 77\% of amyloid-PET
+scans (23\% of patients escalated), against 0.905 for acquiring all
+modalities. A staged evidential method [2] performs Dirichlet-based
 evidential classification on cheap clinical data and escalates to MRI or
 PET when uncertainty exceeds a learned threshold, fusing modality opinions
 by Dempster-Shafer combination and reporting 50--90\% reductions in imaging
-use. A reinforcement-learning formulation [3] treats diagnosis as sequential
+use. A reinforcement-learning (RL) formulation [3] treats diagnosis as sequential
 decision-making, learning a policy that chooses which test to order next.
-None of the three reports a comparison against random acquisition or against
-a cost-matched fixed rule, and none has been compared against the others.
+To our knowledge, none of the three reports a comparison against random
+acquisition or against a cost-matched fixed rule, and none has been compared against the others.
 
 \textbf{Active feature acquisition.} The broader machine-learning
 literature on acquiring features under a budget is mature, with a recent
-survey and benchmark [4, 5], and formal evaluation frameworks for the
-static and time-varying settings [6]. Our finding is consistent with a
+survey and benchmark [4, 5], and a formal evaluation framework for the
+static setting [6]. Our finding is consistent with a
 known and uncomfortable pattern in that literature: informed acquisition
 strategies frequently fail to beat random selection. This has been
-documented as a general result for feature selection [7] and, in a clinical
-cohort, as a ``flat-to-negative lift over random'' for acquisition methods
-evaluated against clinical labels [8]. Our contribution is not the
-discovery of that pattern but its demonstration for these specific,
+documented for unsupervised feature selection [7] and, in an
+inflammatory bowel disease cohort, as a ``flat-to-negative lift over random''
+for the leading planner when evaluated against clinical labels [8]. Our
+contribution is not the discovery of that pattern but its demonstration for these specific,
 named AD policies under a controlled protocol.
 
 \textbf{Simple baselines in AD prediction.} That simple models are hard to
-beat in this domain is likewise established. The TADPOLE challenge compared
-92 algorithms from 33 teams and found that for cognitive-decline forecasting
-no submission was considerably better than the organisers' benchmark mixed-effects
-model [9]. Our result extends that lesson from forecasting to acquisition.
+beat in this domain is likewise established. The TADPOLE challenge received
+92 submissions from 33 teams and found that for ADAS-Cog13 forecasting no
+submission was considerably better than the organisers' benchmark
+mixed-effects model [9]. Our result extends that lesson from forecasting to acquisition.
 
 \textbf{Structural features and incomplete data.} The constructive part of
 our result rests on two established findings, and we claim novelty for
@@ -172,64 +206,110 @@ previously been done.
 
 \textbf{Methodological rigour.} Reported accuracies in this field are known
 to be inflated by data leakage. A scoping review of 44 AD deep-learning
-studies found that 68.2\% relied on ADNI, only 15.9\% performed any external
-validation, and that subject-wise rather than slice-wise splitting can move
-reported accuracy by 28 percentage points [12, 13]. Our protocol is designed
+studies found that 68.2\% relied on ADNI and only 15.9\% performed any
+external validation [12], and splitting by slice rather than by subject can
+move reported accuracy by as much as 28 percentage points [12, 13]. Our protocol is designed
 against these failure modes. Fairness in AD prediction models has been
 examined for prediction accuracy [14], but not, to our knowledge, for
 acquisition decisions.
 
-\section{Materials and Methods}
+\section{Proposed Work}
+Figure 1 summarises the evaluation pipeline; Section 3.5 describes the
+proposed configuration.
 
-\begin{center}
-\includegraphics[width=0.82\textwidth]{fig_pipeline_block_diagram.png}
-\vspace{5pt}
-\textbf{Figure 1.} Overview of the evaluation pipeline, from cohort
-definition through the held-out test evaluation. Always-available
-covariates (blue, left) and the four acquirable modality blocks
-(orange, right) enter a subject-level, outcome-stratified split
-performed before any preprocessing statistic is computed. Acquisition
-policies (orange) decide which blocks to acquire on the training/validation
-side only; a shared, per-fold-refit logistic-regression predictor bank
-(green) is used for every policy so that differences in outcome reflect
-differences in the acquisition decision rather than predictor strength.
-The held-out test set is untouched until the final, single evaluation at
-each of the three prediction horizons.
-\end{center}
-\vspace{10pt}
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=0.92\textwidth]{fig_pipeline_block_diagram.png}
+\par\vspace{5pt}
+\textbf{Figure 1.} Evaluation pipeline. The subject-level split is made
+before any preprocessing statistic is computed; every policy uses the same
+per-fold logistic-regression predictor bank, so differences between policies
+reflect the acquisition decision; the test set is scored only at the end.
+\end{figure}
 
 \subsection{Cohort}
-Data were drawn from ADNI. Diagnosis, demographics, genotype, cognitive
+Data were drawn from the Alzheimer's Disease Neuroimaging Initiative (ADNI)
+database (adni.loni.usc.edu). Diagnosis, demographics, genotype, cognitive
 assessments, FreeSurfer morphometry, PET summaries and CSF assays were
 assembled from the source tables rather than a pre-merged file. All joins
 use ADNI's harmonised visit code; the protocol-specific visit code is not
 comparable across study phases and its use silently corrupts longitudinal
 merges. Screening visits were coalesced into baseline where no baseline
 record exists, with a genuine baseline record always taking precedence --
-without this, 294 MCI participants whose diagnosis is recorded only at
+without this, 274 MCI participants whose diagnosis is recorded only at
 screening are dropped, and dropped unevenly by phase.
 
-Inclusion was MCI at the baseline visit, giving 1,622 participants from
-3,777. Conversion labels were derived at 12, 24 and 36 months. Participants
-with insufficient follow-up are censored and excluded from that horizon's
-metrics rather than coded as non-converters; participants reverting to
-normal cognition are tracked as a distinct category and never merged into
-``stable''. Converter counts were 121, 237 and 297 at the three horizons.
+Inclusion was MCI at the baseline visit, giving 1,566 participants from
+3,762. Baseline predictors come only from the baseline-equivalent record
+(the baseline visit or, where absent, the screening visit; for one FreeSurfer
+table, a scan coded as month 3 that ADNI treats as baseline-equivalent), and
+tables are joined on exact visit codes rather than nearest-date matching, so
+predictors are limited to baseline-equivalent measurements.
+
+\textbf{Outcome definition.} For a horizon of $h\in\{12,24,36\}$ months, a
+participant is a converter (label 1) if any recorded visit at or before month
+$h$ has a diagnosis of dementia, using the month implied by the harmonised
+visit code; a conversion stays a conversion if the diagnosis later reverts.
+A participant with no such visit is a non-converter (label 0) if their last
+recorded visit is at or after month $h$, and is otherwise censored: no label
+is assigned and they are excluded from that horizon rather than coded as
+non-converters. No visit-window tolerance is applied. Participants who
+return to normal cognition at any visit without a prior dementia diagnosis
+are flagged as reverters; they are labelled 0 for classification but
+counted separately in cohort reporting rather than merged into ``stable''.
+Converter counts were 134, 252 and 313, and reverter counts 120, 113 and
+110, at the three horizons. Table 1 traces the 24-month cohort to the final
+analysis sets; the same participants can contribute to more than one
+horizon.
+
+\begin{table}[!htbp]
+\centering
+\textbf{Table 1.} Cohort flow at the 24-month horizon.\\\vspace{5pt}
+\small
+\begin{tabular}{|M{4.0cm}|M{1.1cm}|M{1.9cm}|M{7.0cm}|}
+\hline
+\textbf{Stage} & \textbf{n} & \textbf{Converters} & \textbf{Note} \\
+\hline
+ADNI participants & 3762 & -- & all phases \\\hline
+MCI at baseline & 1566 & 252 & inclusion criterion \\\hline
++ 24-month outcome label & 941 & 252 & 625 censored (insufficient follow-up) \\\hline
++ all four modalities & 458 & 84 & the other 483 labelled subjects form the training pool $P$ \\\hline
+Locked test set & 92 & 17 & scored at the end, on two releases (Section 3.2) \\\hline
+Development set & 366 & 67 & five-fold CV; benchmark, ablation and sex-stratified fairness analyses \\\hline
+\end{tabular}
+\end{table}
+
+The development sets at 12 and 36 months contain 402 subjects (36
+converters) and 334 subjects (86 converters); the test sets contain 9, 17 and
+22 converters at 12, 24 and 36 months.
 
 \subsection{Acquirable modality blocks and costs}
-Demographics, education, APOE genotype, MMSE and CDR-Sum of Boxes are
+Demographics, education, apolipoprotein E (APOE) genotype, Mini-Mental State
+Examination (MMSE) and Clinical Dementia Rating Sum of Boxes (CDR-SB) are
 treated as always available at zero acquisition cost: they are in hand
-before any scan is ordered. Four blocks are acquirable: MRI, FDG-PET,
-amyloid-PET and CSF. FDG, amyloid and tau PET are separate scans with
-separate tracers and are therefore treated as separate acquisitions rather
-than one ``PET'' block; conflating them misstates the decision.
+before any scan is ordered. Four blocks are acquirable in the benchmark:
+MRI, FDG-PET, amyloid-PET and CSF. FDG, amyloid and tau PET are separate
+scans with separate tracers and are therefore treated as separate
+acquisitions rather than one ``PET'' block; conflating them misstates the
+decision. Tau-PET and plasma biomarkers are defined in the feature code but
+excluded from the benchmark: only 153--299 labelled participants hold tau-PET
+(20--43 converters, depending on horizon), and only 19--122 hold a plasma
+measurement, too few at any horizon. In the main benchmark every policy, including the
+fixed rules, uses the same 12-measure structural MRI block described in
+Section 3.5, and so do the robustness, clinical-utility, fairness and
+horizon analyses of Sections 4.3 to 4.6. The customary three-feature block
+(hippocampus, ventricles, intracranial volume) serves only as the ablation
+reference.
 
 Costs are relative units, not currency, and are deliberately swept across
 three regimes rather than fixed: \emph{price-like} (MRI 1.0, FDG 2.0,
-amyloid 5.0, CSF 1.5), \emph{flat} (all 1.0, isolating how many tests from
-which tests), and \emph{burden} (penalising the invasive lumbar puncture
-and radiation-exposing tracers). Any conclusion that holds under only one
-regime is reported as regime-dependent.
+amyloid 5.0, CSF 1.5, roughly proportional to order-of-magnitude list
+prices), \emph{flat} (all 1.0, isolating how many tests from which tests),
+and \emph{burden} (MRI 1.0, FDG 3.0, amyloid 4.0, CSF 6.0, penalising the
+invasive lumbar puncture and radiation-exposing tracers; these weights are
+judgement-based). Acquiring all four modalities therefore costs 9.5, 4.0 and
+14.0 units. Any conclusion that holds under only one regime is reported as
+regime-dependent.
 
 \subsection{Evaluation protocol}
 Comparisons are made on the complete-case cohort for the four blocks, so
@@ -241,213 +321,632 @@ strength. Imputation and scaling are fitted inside each cross-validation
 fold on that fold's training rows only. Each policy, including every
 internal threshold, is refitted within each fold.
 
-A test set was held out and left untouched through all development, then
-spent once. All development figures are five-fold cross-validated on the
-remaining subjects.
+A test set was held out (a stratified 20\% of the complete-case cohort) and
+left untouched through all development. All development figures come from
+five-fold cross-validation (CV) on the remaining subjects.
+\emph{Test-set protocol.} The analysis was completed and the test set scored
+once, at the end, on the September 2026 ADNI release. The data were then
+re-downloaded (October 2026 release, which changed the cohort slightly) and
+the whole pipeline was re-run with unchanged models, operating points and test
+procedure, and the test set was scored a second time. We report the October
+results throughout; the two scorings differ by at most 0.011 AUC for any
+model and horizon. Because the test set was scored on both releases, it is
+not untouched with respect to the first, and the test results should be read
+as two scorings of one fixed procedure, not as an independent replication.
+The test set was not used to choose anything, and the post hoc checks of
+Section 4.4 that look at it are descriptive.
+Labelled subjects who lack at least one of the four modalities (483 at 24
+months) are never evaluated: they form a training pool $P$ used only by the
+proposed configuration (Section 3.5), and are disjoint from every
+development fold and from the test set by construction. Confidence
+intervals (CIs) are percentile intervals from 1,000 bootstrap resamples of
+subjects.
 
 \subsection{Policies compared}
 Reference points are \emph{cheap-only} (never acquires), \emph{acquire-all}
 (always acquires everything), \emph{fixed} rules acquiring a set prefix for
-every patient, and \emph{random} acquisition at a matched rate. The three
-published policies were re-implemented from their descriptions, as no
-public code exists for any of them; results should therefore be read as
-our implementation of each mechanism rather than a reproduction of the
-original numbers.
+every patient (MRI; MRI then FDG), and a \emph{random} baseline in which each
+of the four modalities is acquired independently with a given probability
+(the acquisition rate). A single rate is not cost-matched, so the rate is
+swept from 0 to 1 in steps of 0.1 and every rate is repeated over 50 random
+seeds, with an independent random draw for every patient. The expected cost
+at rate $r$ is $r$ times the cost of acquiring everything (4.75 price-like
+units at $r=0.5$); the \emph{realised} cost is the empirical mean over the
+simulated draws (4.73, 4.73 and 4.72 at $r=0.5$ at 12, 24 and 36 months).
+Table 2 reports realised costs at 24 months and Table 3 the three-horizon
+mean. Each policy is compared with random acquisition at the same expected
+cost (Section 3.6). No public code exists for any of the three published policies, so each was
+re-implemented from its description, giving the nine configurations listed in
+Table 2; results should therefore be read as our implementation of each
+mechanism rather than a reproduction of the original numbers. Table 3 and
+Figure 3 show one representative configuration of each policy: the
+uncertainty cascade at a target escalation of 53.8\%, the staged evidential method's full
+ladder with the shared predictor, and the RL policy at cost weight 0.01. The
+calibration, decision-curve and fairness analyses (Figures 7 and 11) use the
+RL policy at cost weight 0.05.
+
+\begin{table}[!htbp]
+\centering
+\textbf{Table 2.} Configurations compared and their mean acquisition cost per
+patient at 24 months under the price-like, flat and burden regimes. Random
+acquisition is shown at rate 0.5, at its realised cost (expected costs 4.75,
+2.00 and 7.00).\\\vspace{5pt}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{8.6cm}|M{1.7cm}|M{1.5cm}|M{1.6cm}|}
+\hline
+\textbf{Configuration} & \textbf{Price-like} & \textbf{Flat} & \textbf{Burden} \\
+\hline
+\multicolumn{4}{|l|}{\textit{Reference rules}} \\\hline
+cheap-only & 0.00 & 0.00 & 0.00 \\\hline
+fixed MRI & 1.00 & 1.00 & 1.00 \\\hline
+fixed MRI+FDG & 3.00 & 2.00 & 4.00 \\\hline
+random, rate 0.5 per modality (50 seeds) & 4.73 & 1.99 & 6.98 \\\hline
+acquire-all & 9.50 & 4.00 & 14.00 \\\hline
+\multicolumn{4}{|l|}{\textit{Published policies (nine configurations)}} \\\hline
+uncertainty cascade [1], 53.8\% escalated to amyloid & 3.75 & 1.55 & 3.20 \\\hline
+uncertainty cascade [1], 25\% escalated to amyloid & 2.19 & 1.24 & 1.95 \\\hline
+staged evidential [2], full ladder, own predictor & 4.57 & 1.95 & 6.74 \\\hline
+staged evidential [2], full ladder, shared predictor & 4.57 & 1.95 & 6.74 \\\hline
+staged evidential [2], MRI then amyloid, own predictor & 2.99 & 1.00 & 2.49 \\\hline
+staged evidential [2], MRI then amyloid, shared predictor & 2.99 & 1.00 & 2.49 \\\hline
+RL test-ordering [3], cost weight 0.01 & 4.42 & 2.24 & 7.54 \\\hline
+RL test-ordering [3], cost weight 0.05 & 1.44 & 0.94 & 2.88 \\\hline
+RL test-ordering [3], cost weight 0.2 & 0.24 & 0.21 & 0.42 \\\hline
+\end{tabular}
+\end{table}
 
 Prediction is delegated to a shared logistic-regression model bank for all
 policies, so that differences between policies are differences in the
 \emph{acquisition decision} rather than in predictor strength. For the
-evidential method this required an additional variant: its neural predictor
-is weaker than logistic regression at this sample size, and reporting only
-the faithful version would penalise its decision rule for its predictor.
-Both are reported.
+evidential method [2], whose predictor follows evidential deep learning
+[15], this required an additional variant: its neural predictor is weaker
+than logistic regression at this sample size, and reporting only the
+faithful version would penalise its decision rule for its predictor. Both
+are reported.
+
+\subsection{Proposed algorithm: signature-pooled fixed acquisition}
+The audit motivates a deliberately simple alternative, which we call
+\emph{signature-pooled fixed acquisition} (SPFA). SPFA is not a new decision
+rule. Because learned rules did not beat fixed ones, SPFA keeps the
+acquisition decision trivial -- every patient receives the same pre-specified
+modality set $A$ -- and changes only what the predictor for that set is built
+on. Two ingredients, both established, are combined:
+
+\begin{enumerate}[(i)]
+\item \textbf{Signature features.} The customary three-feature MRI block
+(hippocampus, ventricles and intracranial volume, ICV) is replaced by 12
+FreeSurfer measures from regions affected early in AD, motivated by the
+AD-signature literature [10] rather than reproducing its published composite:
+Hippocampus, Amygdala, Entorhinal (cortical volume and mean thickness),
+Fusiform, MidTemporal, InfTemporal, ParaHippocampal, Precuneus and
+PosteriorCingulate (cortical volumes), Ventricles and ICV. Nine regions give
+ten regional measures, plus the two global ones. Because the main benchmark
+gives every policy this same block (Section 3.2), SPFA differs from the fixed
+rules of Table 3 only in ingredient (ii).
+\item \textbf{Pooled state training.} The model for acquisition state
+$S=\mathrm{CHEAP}\cup A$ needs only the blocks in $S$, so it is fitted on
+every labelled subject who holds those blocks rather than on the
+complete-case cohort alone [11].
+\end{enumerate}
+
+Algorithm 1 gives the training procedure and the deployment step is
+described below it; Figure 2 summarises both. Three properties follow from the design.
+\emph{Cost is fixed and known in advance}: $\sum_{b\in A}c_b$ for every
+patient. \emph{Acquisition disparity is zero by construction}, since the
+decision never consults the patient. \emph{Leakage is excluded by construction}: the
+pool $P$ is disjoint from the complete-case cohort, and hence from every
+development fold, inner validation fold and the test set, so pooled rows only
+ever add training data. Imputation and scaling are fitted on $T_S$ only, and
+the regularisation strength $C$ is selected by inner CV on development rows
+alone. For the held-out test, each operating point is refitted once on all
+development subjects plus $P_S$ and scored (Section 3.2). The operating points $A=\{\mathrm{MRI}\}$ and $A=\{\mathrm{MRI},\mathrm{FDG}\}$
+were fixed in advance and were not chosen using the test set.
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=0.86\textwidth]{fig_algorithm_flow.png}
+\par\vspace{5pt}
+\textbf{Figure 2.} The proposed SPFA procedure: training (top) and
+inference for one patient (bottom).
+\end{figure}
+
+\begin{algorithm}[h]
+\caption{SPFA training for acquisition state $S=\mathrm{CHEAP}\cup A$}
+\begin{algorithmic}[1]
+\Require Training rows $D_{tr}$ (development subjects outside the
+evaluation fold); pool $P$ (labelled subjects lacking at least one modality,
+disjoint from all development and test subjects); acquisition set $A$;
+regularisation grid $\mathcal{C}$
+\Ensure Fitted risk model $f_S$
+\State $P_S \gets \{p\in P : p \text{ holds every block in } S\}$
+\State $T_S \gets D_{tr}\cup P_S$ \Comment{pooled training rows}
+\If{$|T_S|<n_{\min}$ \textbf{or} $T_S$ has one class}
+\State $T_S \gets D_{tr}$ \Comment{fall back to complete cases (in every fit)}
+\EndIf
+\ForAll{$C\in\mathcal{C}$} \Comment{inner 3-fold CV on $D_{tr}$ only}
+\State $\mathrm{AUC}(C)\gets$ mean AUC over inner folds $V\subset D_{tr}$ of
+a model fitted with $C$ on $(D_{tr}\setminus V)\cup P_S$ and scored on $V$
+\EndFor
+\State $C^\ast \gets \arg\max_{C}\mathrm{AUC}(C)$
+\State Fit median imputer and standard scaler on $T_S$ (features of $S$ only)
+\State Fit $L_2$ logistic regression $f_S$ on $T_S$ with $C^\ast$
+\State \Return $f_S$
+\end{algorithmic}
+\end{algorithm}
+
+Deployment is a single step: acquire the fixed set $A$ for every patient
+and return $\hat p=f_S(x)$ at cost $\kappa=\sum_{b\in A}c_b$.
+Honest performance estimation uses nested cross-validation: the outer loop
+measures AUC, and $C^\ast$ is re-selected inside every outer fold, so the
+reported figure is never one that anything was tuned on. The measured
+selection optimism of the non-nested estimate was +0.0016 AUC.
 
 \subsection{Statistics}
 Differences between policies are assessed by paired bootstrap on pooled
-out-of-fold predictions for the same subjects, which is considerably more
-sensitive than comparing independent confidence intervals. Acquisition-rate
+out-of-fold predictions for the same subjects (1,000 resamples of subjects,
+two-sided 95\% percentile intervals; a difference is called significant when
+the interval excludes zero), which is considerably more sensitive than
+comparing independent confidence intervals. Each policy is compared with
+\emph{random acquisition at the same expected cost}: for a policy whose mean
+cost is $c$ under a given cost regime, the reference is random acquisition
+at rate $c$ divided by the cost of acquiring all four modalities, averaged
+over 50 seeds and scored on the same subjects and the same cross-validation
+folds. The paired difference carries a 95\% percentile interval and a two-sided
+bootstrap $p$-value from 10,000 subject resamples (the $p$-value is
+$(k+1)/(B+1)$, so it cannot fall below $10^{-4}$). The \emph{comparison
+family} is the 13 policies that differ from random acquisition at their own
+cost, within each horizon and cost regime: the nine published configurations,
+fixed MRI, fixed MRI+FDG and the two SPFA operating points. Cheap-only and
+acquire-all are excluded, since random acquisition at rate 0 and 1 is
+identical to them. Holm adjustment is applied within each family of 13. We
+report the unadjusted interval and the Holm-adjusted $p$-value separately and
+call a difference \emph{significant after adjustment} only when the adjusted
+$p<0.05$; ``significant'' without qualification never refers to the unadjusted
+interval. Comparisons with acquire-all are paired bootstrap intervals without
+adjustment and are descriptive.
+
+The matching is by \emph{expected} cost, not a strict fixed budget. Random
+acquisition draws a different cost for every patient, so a policy whose mean
+cost is $c$ is compared with random acquisition whose mean cost over 50 seeds
+is within 0.03, 0.01 and 0.05 units of $c$ (price-like, flat, burden; largest
+deviation over all policies and horizons), and whose seed-to-seed SD of mean
+cost is at most 0.23 units. Per-patient cost varies: at the matched rate its
+SD is 0.6 to 2.8 units under price-like costs, against 0.5 to 3.0 for the
+adaptive policies at their own cost, so the two spend with comparable spread.
+The same procedure is applied separately under each regime, with that regime's
+cost weights and its own matched rate. Acquisition-rate
 disparities are tested with a bootstrap over subgroups and corrected for
-multiplicity using the Benjamini-Hochberg procedure [15]; with dozens of
+multiplicity using the Benjamini-Hochberg procedure [16]; with dozens of
 (policy, modality) comparisons, uncorrected significance is not evidence.
 Calibration is reported as slope, intercept and Brier score, and clinical
-utility as net benefit across threshold probabilities [16].
+utility as net benefit across threshold probabilities [17].
 
 \section{Results and Discussion}
 
-\subsection{No policy outperforms random acquisition}
-Table 1 gives cross-validated AUC by policy and horizon on the development
-set. Figure 2 plots the same results as a cost-accuracy frontier. The
-ordering is stable but the differences are small, and the
-statistical comparison is decisive: across all three horizons, \textbf{no
-learned policy significantly outperformed random acquisition}. Eleven
-policy-horizon pairs were significantly \emph{worse} than random. Only
-acquire-all beat random, and only at 36 months.
+\subsection{Adaptive policies do not outperform cost-matched random acquisition}
+Table 3 gives cross-validated AUC by policy and horizon on the development
+set, and Figure 3 plots the same results as a cost-AUC frontier. Differences
+between policies are small and their ranking changes between horizons.
+Random acquisition is not a single number, because its AUC depends on how
+much it spends. Across the rate sweep it rises smoothly from the cheap-only
+value (0.816, 0.810 and 0.793 at 12, 24 and 36 months) to the acquire-all
+value (0.862, 0.893 and 0.898), reaching 0.846, 0.870 and 0.868 at rate 0.5
+(Figure 4). Its seed-to-seed SD is 0.004--0.019 at intermediate rates, and
+the subject-bootstrap interval around the seed-averaged AUC has a half-width
+of 0.03--0.06, which is the real uncertainty in the baseline; the
+acquire-all AUC lies inside the rate-0.5 interval at every horizon. (A
+single draw of one random policy can therefore land well above or below the
+mean, which is why a single-rate, single-seed baseline is not informative.)
 
-\begin{center}
-\textbf{Table 1.} Cross-validated AUC by policy and horizon (development
-set; test set untouched). Cost in relative price-like units.\\\vspace{5pt}
-\begin{table}[h]
-\begin{center}
+Compared with random acquisition at the same expected cost, \textbf{adaptive
+selection gave no consistent gain}. We report unadjusted and Holm-adjusted
+results separately (Section 3.6). Of the 27 configuration-horizon pairs for
+the published policies under price-like costs, \emph{unadjusted}, 22 had a
+paired 95\% interval including zero, 2 were better and 3 were worse.
+\emph{After Holm adjustment}, 25 of 27 showed no significant difference: one
+was better (the RL policy at cost weight 0.05 at 12 months, AUC +0.040, 95\%
+CI +0.016 to +0.066, adjusted $p=0.014$, which did not recur at 24 or 36
+months) and one was worse (the staged evidential method's full ladder with
+its own neural predictor at 12 months, $-0.169$, adjusted $p=0.003$). The
+other three unadjusted differences did not survive adjustment: losses of the
+evidential method's MRI-then-amyloid variant with its own predictor at 12 and
+24 months (adjusted $p=0.11$ and $0.10$) and a gain of the 25\%-escalation
+uncertainty cascade at 36 months (+0.028, 95\% CI +0.002 to +0.053, adjusted
+$p=0.37$). All three unadjusted losses were evidential variants using that
+method's own neural predictor, which is weaker than logistic regression at
+this sample size (Section 3.4).
+Under flat costs, 1 pair was better and 3 worse unadjusted, and after
+adjustment none was better and one worse (the same evidential full ladder);
+the RL gain at 12 months is not significant after adjustment under flat costs
+(adjusted $p=0.079$). Under burden costs, 4 were better and 2 worse
+unadjusted, and after adjustment 2 were better (the same RL gain, adjusted
+$p=0.026$, and the 25\%-escalation cascade at 36 months, adjusted $p=0.035$)
+and one worse. The gains therefore depend on the cost regime, and neither
+recurs across horizons.
+
+The reference rules tell a different story. At their own cost, fixed MRI and
+fixed MRI+FDG exceeded random acquisition at matched cost by +0.009 to +0.036
+AUC, with unadjusted intervals excluding zero at 24 and 36 months for both
+rules (for example fixed MRI+FDG at 24 months, +0.034, 95\% CI +0.011 to
++0.058; adjusted $p=0.058$);
+and SPFA, which uses the same fixed acquisition rule with a better predictor,
+did so, unadjusted, at all horizons for MRI+FDG and, after adjustment, at 24
+and 36 months for MRI-only (Section 4.4). Cheap-only and acquire-all coincide with
+random at rates 0 and 1 by construction. The conclusion that survives is
+therefore narrower than ``nothing beats random'': \emph{choosing per patient
+adds nothing to what the same budget buys at random, whereas a fixed rule
+with good inputs does beat both}. Random acquisition is also a stronger
+baseline than a single rate suggests: it costs more than most published
+configurations at its default rate (Table 2), so the matched comparison is
+the fair test, and the domination analysis in the next section is its
+complement, asking whether a patient-independent rule matches the policy at
+no greater cost.
+
+\begin{table}[!htbp]
+\centering
+\textbf{Table 3.} Cross-validated AUC by policy and horizon (development
+set; test set not used), with one representative configuration of each
+published policy (Section 3.4). Cost in relative price-like units, realised
+and averaged over the three horizons. The random row is the mean over 50
+seeds; its seed-to-seed SD is 0.010--0.015 and its 95\% subject-bootstrap CI
+has a half-width of 0.03--0.06 (Figure 4).\\\vspace{5pt}
 \begin{tabular}{|M{5.2cm}|M{1.5cm}|M{1.6cm}|M{1.6cm}|M{1.6cm}|}
 \hline
 \textbf{Policy} & \textbf{Cost} & \textbf{12 mo} & \textbf{24 mo} & \textbf{36 mo} \\
 \hline
-cheap-only & 0.00 & 0.817 & 0.824 & 0.796 \\\hline
-fixed MRI & 1.00 & 0.836 & 0.870 & 0.849 \\\hline
-fixed MRI+FDG & 3.00 & 0.851 & 0.887 & 0.885 \\\hline
-uncertainty cascade [1] & 3.63 & 0.852 & 0.886 & 0.865 \\\hline
-staged evidential [2] & 4.78 & 0.852 & 0.895 & 0.856 \\\hline
-RL test-ordering [3] & 4.81 & 0.849 & 0.866 & 0.882 \\\hline
-random acquisition & 5.07 & 0.843 & 0.899 & 0.875 \\\hline
-acquire-all & 9.50 & 0.862 & 0.894 & 0.900 \\\hline
+cheap-only & 0.00 & 0.817 & 0.810 & 0.793 \\\hline
+fixed MRI & 1.00 & 0.836 & 0.863 & 0.849 \\\hline
+fixed MRI+FDG & 3.00 & 0.851 & 0.886 & 0.883 \\\hline
+uncertainty cascade [1] & 3.68 & 0.852 & 0.883 & 0.862 \\\hline
+RL test-ordering [3] & 4.35 & 0.848 & 0.872 & 0.875 \\\hline
+staged evidential [2] & 4.73 & 0.852 & 0.877 & 0.862 \\\hline
+random, rate 0.5 (mean of 50 seeds) & 4.73 & 0.846 & 0.870 & 0.868 \\\hline
+acquire-all & 9.50 & 0.862 & 0.893 & 0.898 \\\hline
 \end{tabular}
-\end{center}
 \end{table}
-\end{center}
 
 
-\begin{center}
+\begin{figure}[!tbp]
+\centering
 \includegraphics[width=\textwidth]{fig1_cost_accuracy_frontier.png}
-\vspace{5pt}
-\textbf{Figure 2.} Cost-accuracy frontier at each prediction horizon
-(development set, cross-validated). Dashed line marks the accuracy reached
-by acquiring all four modalities at cost 9.5. Key: cheap = cheap-only;
+\par\vspace{5pt}
+\textbf{Figure 3.} Cost-AUC frontier at each prediction horizon
+(development set, cross-validated). The dashed line marks the AUC reached by
+acquiring all four modalities at cost 9.5. Key: cheap = cheap-only;
 fix-M = fixed MRI; fix-MF = fixed MRI+FDG; rand = random acquisition;
 all = acquire-all; [1] uncertainty cascade; [2] staged evidential;
-[3] RL test-ordering; ours-M and ours-MF = cost-matched configuration.
-No published adaptive policy (squares) sits above the reference baselines
-(circles) at matched cost.
+[3] RL test-ordering (cost weight 0.01); ours-M and ours-MF = SPFA with MRI
+and with MRI+FDG.
+Published adaptive policies (squares) rarely sit above the frontier traced by
+the reference rules (circles); Section 4.2 counts how many are dominated.
 \vspace{10pt}
-\end{center}
+\end{figure}
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig_random_sweep.png}
+\par\vspace{5pt}
+\textbf{Figure 4.} Cost-matched random baseline. The grey line is the AUC of
+random acquisition (each modality acquired independently with the rate
+varied from 0 to 1; mean of 50 seeds) against its realised price-like cost,
+with the 95\% subject-bootstrap interval of the seed-averaged AUC shaded.
+Markers show fixed rules (blue), published adaptive policies (orange; the
+configurations of Table 3 plus RL at cost weight 0.05) and SPFA (green).
+Points above the line spend their budget better than random acquisition
+does.
+\end{figure}
+
+Figure 5a shows what each policy actually orders. The uncertainty cascade
+sends every patient to MRI and roughly half (55\%) onward to amyloid-PET, so
+its mean load is about 1.5 modalities. The staged evidential method acquires
+each of the four modalities for about half of patients (about 1.9 modalities
+per patient), a profile close to that of random acquisition at rate 0.5
+(2.0). At cost weight 0.05 the RL policy orders MRI (40\%) and CSF (28\%) most
+often, FDG sometimes (21\%) and amyloid-PET rarely (4\%); at cost weight 0.01
+it orders about 2.2 modalities per patient (MRI 67\%, FDG 64\%, CSF 62\%,
+amyloid-PET 31\%). Policies that spend
+like random acquisition and perform no better than it have, in effect,
+learned to spend rather than to select.
+
 
 \subsection{Learned policies are dominated by fixed rules}
-A stronger test than accuracy alone is domination: is a learned policy
-beaten by a patient-independent rule that costs no more? Across the three
-horizons, \textbf{18 of 33 policy-horizon pairs were dominated}, most often
-by ``always acquire MRI+FDG'' (cost 3.00). At 36 months, 9 of 11 learned
-configurations were dominated.
+A stronger test than AUC alone is domination: is a learned policy beaten by a
+patient-independent rule that costs no more? Under price-like costs,
+\textbf{19 of 27 configuration-horizon pairs were dominated} (4, 7 and 8 of
+the nine configurations at 12, 24 and 36 months), by fixed MRI+FDG (cost
+3.00) in 9 cases, by cheap-only in 5 and by fixed MRI in 5. Figure 5b repeats
+the count under each cost regime.
 
-This result is cost-regime dependent and we report it as such. Under the
-price-like regime the RL policy and the uncertainty cascade are both
-dominated; under flat and burden regimes the cascade escapes domination,
-and the staged evidential method is dominated under none. The claim that
-survives all three regimes is the one in Section 4.1, because a paired
-comparison against random makes no cost assumption at all.
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig4_acquisition_domination.png}
+\par\vspace{3pt}
+\textbf{Figure 5.} (a) Expected number of modalities acquired per patient by
+each policy in the 24-month benchmark, split by modality. (b) Number of the
+nine published configurations dominated by a patient-independent rule at
+each horizon, under each cost regime.
+\end{figure}
+
+Domination depends partly on the cost regime, and we report it as such.
+Under flat costs 12 of the 27 pairs remain dominated (3, 3 and 6 at the
+three horizons) and under burden costs 16 (4, 6 and 6); the 12 flat-cost
+pairs are dominated under all three regimes. At 24 months the uncertainty
+cascade escapes domination under flat and burden costs, and the staged
+evidential method with the shared predictor under flat costs. The comparison
+with cost-matched random acquisition in Section 4.1 is made separately under
+each regime and gives the same qualitative answer under all three.
 
 \subsection{Robustness}
-Three attacks were made on the negative result. Replacing the shared
-logistic regression with gradient boosting \emph{strengthened} it: all
-three learned policies became dominated, and fixed MRI+FDG reached 0.878
-at cost 3.0 against acquire-all's 0.878 at cost 9.5. Varying the random
-seed left the ordering unchanged (per-policy SD 0.003--0.011). Decision-curve
-analysis extended the finding to clinical utility: across every threshold
-probability from 0.05 to 0.50, the best strategy was always random, fixed
-or acquire-all, and never a learned policy. Calibration did not favour the
-learned policies either -- random acquisition was among the best calibrated
-(slope 0.902) and acquire-all the worst (slope 0.686).
+Two further checks probe the negative result; both give every policy the
+same 12-measure MRI block as the main benchmark. Replacing the shared
+logistic regression with gradient boosting did not rescue the published
+policies: at 24 months two of the three representative configurations (the
+uncertainty cascade and RL at cost weight 0.05) were dominated, and the
+staged evidential method was not (0.868 at cost 4.6, against 0.855 for fixed
+MRI+FDG at 3.0 and 0.881 for acquire-all at 9.5).
+Gradient boosting lowered AUC for every policy, by 0.010 (evidential) to
+0.055 (RL) and by 0.031 for fixed MRI+FDG (Figure 6b), so logistic regression
+was the stronger predictor at this sample size. Across random seeds 0, 7 and
+42, per-policy AUC standard deviations (SDs) were 0.004--0.014 (Figure 6a);
+the ranking shifted between seeds, but acquire-all ranked first and fixed MRI
+and cheap-only last at every seed, and the best published policy ranked
+second at one seed and below fixed MRI+FDG at the other two.
 
-\subsection{A cost-matched configuration}
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig5_robustness.png}
+\par\vspace{3pt}
+\textbf{Figure 6.} (a) Seed robustness at 24 months: dots are seeds 0, 7
+and 42; the bar is mean $\pm$ SD. (b) AUC under the shared logistic
+regression and under gradient boosting on the same 366-subject cohort (seed
+42). Both panels use the 12-measure MRI block.
+\end{figure}
+
+Decision-curve analysis extended the comparison to clinical utility
+(Figure 7a). Every strategy delivered a clear net benefit over treating
+everyone at thresholds of 0.10 and above, and no published policy led
+consistently: the highest net benefit came from acquire-all at four of the
+ten thresholds (0.05, 0.15, 0.20 and 0.30), fixed MRI+FDG at 0.10, the
+uncertainty cascade at 0.25, and SPFA with MRI+FDG at 0.35--0.50. Where a
+published policy exceeded the best reference strategy (thresholds 0.25, 0.35
+and 0.40) it did so by at most 0.005. Calibration slopes did not favour the
+published policies either: cheap-only was the best calibrated reference
+(slope 0.828), random acquisition scored 0.780, the three published policies
+ranged from 0.733 to 0.756, and acquire-all was the worst (0.725); SPFA was
+closest to ideal (1.080 and 1.104). Figure 7b shows reliability curves for
+the reference strategies and SPFA.
+
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig6_clinical_utility.png}
+\par\vspace{3pt}
+\textbf{Figure 7.} (a) Net benefit across threshold probabilities in the
+24-month benchmark, with treat-all and treat-none references (RL policy not
+shown, for legibility). (b) Reliability diagram: mean predicted risk against
+observed conversion rate within risk bins.
+\end{figure}
+
+\subsection{The proposed configuration (SPFA)}
 If the savings these policies chase do not require a policy, they should be
-obtainable directly. Replacing the customary three-feature MRI block
-(hippocampus, ventricles, intracranial volume) with established
-AD-signature regions [10], and fitting each acquisition state on every
-participant holding that state rather than on complete cases only [11],
-yields the configuration in Table 2. Neither ingredient is novel; their use
-as the baseline against which adaptive policies are measured is.
+obtainable directly. Table 4 gives the nested cross-validated AUC of SPFA,
+which combines the expanded MRI block [10] with training each acquisition
+state on every participant who holds it rather than on complete cases only
+[11]. Neither ingredient is novel; their use as the baseline against which
+adaptive policies are measured is. Cost ratios refer to acquire-all (9.5
+price-like units): 9.5 for MRI-only and 3.2 for MRI+FDG.
 
-\begin{center}
-\textbf{Table 2.} Nested cross-validated AUC of the cost-matched
-configuration. Nested CV re-selects regularisation within each outer fold;
-measured selection optimism was +0.0008 AUC.\\\vspace{5pt}
-\begin{table}[h]
-\begin{center}
+\begin{table}[!htbp]
+\centering
+\textbf{Table 4.} Nested cross-validated AUC of SPFA. Nested CV re-selects
+regularisation within each outer fold; measured selection optimism was
++0.0016 AUC. Acquire-all has no tuned hyperparameters, so its row repeats the
+five-fold value from Table 3.\\\vspace{5pt}
 \begin{tabular}{|M{4.4cm}|M{1.5cm}|M{1.6cm}|M{1.6cm}|M{1.6cm}|}
 \hline
 \textbf{Configuration} & \textbf{Cost} & \textbf{12 mo} & \textbf{24 mo} & \textbf{36 mo} \\
 \hline
-MRI only & 1.00 & 0.873 & 0.884 & 0.864 \\\hline
-MRI + FDG & 3.00 & 0.885 & 0.896 & 0.888 \\\hline
-acquire-all (reference) & 9.50 & 0.862 & 0.894 & 0.900 \\\hline
+SPFA, MRI-only & 1.00 & 0.872 & 0.883 & 0.860 \\\hline
+SPFA, MRI+FDG & 3.00 & 0.885 & 0.897 & 0.885 \\\hline
+acquire-all (reference) & 9.50 & 0.862 & 0.893 & 0.898 \\\hline
 \end{tabular}
-\end{center}
 \end{table}
-\end{center}
 
-On the held-out test set, spent once, the MRI-only configuration reached
-AUC 0.947, 0.911 and 0.852 at 12, 24 and 36 months against acquire-all's
-0.928, 0.923 and 0.933. Paired against acquire-all, neither configuration
-was significantly worse at any horizon. The weakest case is MRI-only at 36
-months (--0.081, 95\% CI --0.177 to +0.003), where the interval only just
-includes zero; this weakness was visible in development and is reported
-rather than rounded away.
+These nested estimates are point estimates. The paired comparison with
+acquire-all (Table 5, from the five-fold development benchmark, which is not
+nested) shows no significant difference for either configuration at 12 or 24
+months, and none for MRI+FDG at 36 months; MRI-only was significantly lower
+than acquire-all at 36 months. Failing to detect a difference is not
+evidence of equivalence, and no equivalence margin was pre-specified.
+
+\begin{table}[!htbp]
+\centering
+\textbf{Table 5.} Paired AUC difference of SPFA from acquire-all (SPFA minus
+acquire-all; development cross-validation; 95\% bootstrap CI).\\\vspace{5pt}
+\small
+\begin{tabular}{|M{3.2cm}|M{3.55cm}|M{3.55cm}|M{3.55cm}|}
+\hline
+\textbf{Configuration} & \textbf{12 mo} & \textbf{24 mo} & \textbf{36 mo} \\
+\hline
+MRI-only (cost 1.0) & $-0.002$ ($-0.055$, $+0.059$) & $-0.009$ ($-0.035$, $+0.018$) & $-0.036$ ($-0.068$, $-0.004$) \\\hline
+MRI+FDG (cost 3.0) & $+0.011$ ($-0.016$, $+0.037$) & $-0.002$ ($-0.026$, $+0.021$) & $-0.016$ ($-0.040$, $+0.008$) \\\hline
+\end{tabular}
+\end{table}
+
+Against random acquisition at the same cost (Section 4.1), SPFA with MRI
+only was better by +0.032, +0.056 and +0.046 AUC at 12, 24 and 36 months; the
+24- and 36-month intervals excluded zero (+0.026 to +0.089 and +0.018 to
++0.077) and survived Holm adjustment (adjusted $p=0.010$ and $0.016$). SPFA
+with MRI+FDG was better by +0.040, +0.039 and +0.034, with unadjusted
+intervals excluding zero at all three horizons (for example +0.010 to +0.068
+at 24 months) but adjusted $p$-values of 0.42, 0.097 and 0.067, so none
+survived adjustment. The adjustment
+matters: the strongest claim these data support is for the MRI-only operating
+point, with the MRI+FDG point suggestive.
+
+An ablation separates the two ingredients (Figure 8), relative to the
+three-feature block trained on complete cases. At the 24-month horizon, the
+combination improves the MRI-only state by +0.034 AUC
+(95\% CI +0.007 to +0.063). Pooled training alone gives +0.019 (+0.004 to
++0.036), whose interval also excludes zero, and the expanded features alone
++0.013 ($-0.011$ to +0.039), whose interval includes zero, so the significant
+part of the gain at this state is attributable to pooling. At richer
+acquisition states (MRI+FDG or more) the changes are within noise (at most
++0.007) and slightly negative at the amyloid state ($-0.009$, interval
+including zero), so the benefit is concentrated at the cheap end of the
+frontier, which is where it matters for cost. Because the main benchmark
+already gives every policy the expanded block, the gap between SPFA and the
+fixed rules in Table 3 reflects pooling alone: +0.021 AUC for MRI-only at 24
+months (95\% CI +0.001 to +0.042), significant only at the margin.
+
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig7_ablation.png}
+\par\vspace{3pt}
+\textbf{Figure 8.} (a) Cross-validated AUC at each acquisition state for
+the three-feature and the expanded MRI block, each with and without pooled
+training, at 24 months (95\% CI). (b) Paired change in AUC relative to the
+three-feature, complete-case reference for each ingredient alone and both
+together (95\% bootstrap CI).
+\end{figure}
+
+On the held-out test set (scored at the end on two releases; Section 3.2), SPFA
+with MRI only reached AUC 0.944, 0.908 and 0.855 at 12, 24 and 36 months
+against acquire-all's 0.928, 0.922 and 0.944. Paired against acquire-all,
+neither SPFA operating point was significantly worse at any horizon. The
+weakest case is MRI-only at 36 months ($-0.089$, 95\% CI $-0.186$ to
+$+0.000$), where the upper limit sits at zero to three decimals; this weakness was visible in development and is reported
+rather than rounded away (Figure 9).
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=0.86\textwidth]{fig_final_test_forest.png}
+\par\vspace{5pt}
+\textbf{Figure 9.} Held-out test AUC with 95\% bootstrap CI for the proposed
+SPFA operating points (``ours''), fixed MRI+FDG (expanded MRI block,
+complete-case training), cheap-only and acquire-all, at the 12-, 24- and 36-month horizons. Intervals
+overlap throughout because the test sets contain only 9, 17 and 22 converters.
+\vspace{10pt}
+\end{figure}
 
 Three cautions attach to the test figures. The test sets are small (9, 17
 and 22 converters), so ``not significantly worse'' is weak evidence of
-equivalence. Test AUCs run above development AUCs by up to 0.074, which is
-small-sample variation rather than a real gain -- the nested figures in
-Table 2 are the ones to quote as expected performance. And the set was
-spent once by design.
+equivalence: the intervals are compatible with losses of up to 0.186 AUC for
+MRI-only at 36 months. For the two SPFA operating points, test AUC differed
+from the nested development estimate by $-0.005$ to $+0.072$ (largest for
+MRI-only at 12 months: 0.944 against 0.872), and the 12-month test set
+appears easier overall: all five models scored 0.066 to 0.099 above their
+development estimates, including cheap-only (+0.099). Two post hoc,
+descriptive checks (nothing was tuned on them) put this in context. First, we
+drew 20,000 random subsets of the development out-of-fold predictions with
+the same size and number of converters as each test set. The standard
+deviation of AUC across such subsets is 0.04--0.06 at 12 months and
+0.03--0.05 at 24 and 36 months, and the observed 12-month test AUCs fall at
+the 92nd to 99th percentile of that distribution (24 and 36 months: 41st to
+95th, with acquire-all at 36 months the highest at 94.5th); the five models
+share the same test subjects, so these percentiles are not independent. A
+12-month gap of this size is therefore unusual but not implausible for nine
+converters. Second, test and development subjects were similar at baseline:
+standardised mean differences in age, education, MMSE, CDR-SB, APOE4 and
+hippocampal and ventricular volume were at most 0.23 in magnitude, and
+outcome prevalence matched (9.0\% against 8.9\%, 18.3\% against 18.5\%, and
+25.7\% against 26.2\% at 12, 24 and 36 months). We therefore attribute the
+differences to small-sample variation rather than a real gain, but cannot
+exclude other causes; the nested figures in Table 4 are the ones to quote as
+expected performance. As a check on leakage, test subjects are excluded from
+the training pool by construction and the split asserts that no subject
+appears in two partitions; operating points, feature blocks and the
+regularisation grid were fixed before the test set was scored, and it was
+scored at the end on two releases (Section 3.2).
 
 \subsection{Representation attrition and the limits of fairness auditing}
 The complete-case multimodal design this literature relies on has a
-demographic cost that is not usually reported. Table 3 traces it, and
-Figure 3 plots the same attrition alongside cohort size.
+demographic cost that is not usually reported. Table 6 traces it, and
+Figure 10a plots the same attrition alongside cohort size.
 
-\begin{center}
-\textbf{Table 3.} Representation attrition through cohort construction
-(24-month horizon).\\\vspace{5pt}
-\begin{table}[h]
-\begin{center}
-\begin{tabular}{|M{6.2cm}|M{1.6cm}|M{2.4cm}|M{2.4cm}|}
+\begin{table}[!htbp]
+\centering
+\textbf{Table 6.} Representation attrition through cohort construction
+(24-month horizon). Percentages use each stage's own $n$ as the denominator.\\\vspace{5pt}
+\begin{tabular}{|M{5.6cm}|M{1.6cm}|M{3.1cm}|M{3.1cm}|}
 \hline
 \textbf{Stage} & \textbf{n} & \textbf{non-White (n)} & \textbf{non-White (\%)} \\
 \hline
-MCI at baseline & 1622 & 277 & 17.1 \\\hline
-+ has 24-month outcome & 904 & 69 & 7.6 \\\hline
-+ complete four modalities & 457 & 27 & 5.9 \\\hline
+MCI at baseline & 1566 & 222 & 14.2 \\\hline
++ 24-month outcome label & 941 & 86 & 9.1 \\\hline
++ all four modalities & 458 & 27 & 5.9 \\\hline
 \end{tabular}
-\end{center}
 \end{table}
-\end{center}
 
-\begin{center}
-\includegraphics[width=0.85\textwidth]{fig_representation_attrition.png}
-\vspace{5pt}
-\textbf{Figure 3.} Cohort size (blue bars, left axis) and non-White
-representation (orange line, right axis) at each stage of complete-case
-cohort construction for the 24-month horizon. Each stage's non-White
-count is annotated on the line.
-\end{center}
-\vspace{10pt}
 
-Requiring an outcome label removes three-quarters of non-White
-participants, and requiring complete modalities removes most of the
-remainder. The mechanism is identifiable: ADNI's most recent phase is
-49.8\% non-White, a substantial recruitment improvement, but only 1.7\% of
-its participants yet have 24-month follow-up. ADNI's diversity gains are
+Requiring an outcome label removes 61\% of non-White participants (222 to
+86), and requiring complete modalities removes most of the remainder (to
+27). The mechanism is identifiable: among MCI participants, ADNI's most
+recent phase (ADNI4) is 38.8\% non-White, against 6.3--9.4\% in ADNI1, ADNI-GO
+and ADNI2, a substantial recruitment improvement, but only 16.3\% of its
+participants yet have 24-month follow-up (48--87\% in earlier phases). ADNI's diversity gains are
 therefore structurally invisible to conversion-prediction studies at
-present.
+present. Figure 10b shows how thin the non-White strata are in the audit
+cohort itself.
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig9_attrition.png}
+\par\vspace{3pt}
+\textbf{Figure 10.} (a) Cohort size (blue bars, left axis) and non-White representation (orange line, right axis) at each stage of complete-case cohort construction, 24 months. (b) Participants by self-reported race in the 24-month audit cohort; grey bars mark groups too small for stratified inference.
+\end{figure}
 
 The practical consequence is that a race-stratified fairness audit of these
-policies is not currently feasible: the audit cohort contains 10 Black and
-8 Hispanic participants with no converters between them. On sex, the only
-adequately powered dimension, no acquisition disparity survived
-multiplicity correction. Two gaps were significant uncorrected -- the RL
-policy sending one sex for FDG-PET 11.1 percentage points more often
-($p=0.011$) and the evidential method 11.2 points less often ($p=0.029$) --
-but neither survived Benjamini-Hochberg across the comparison family, and
-they are reported as suggestive only. We note that fixed policies cannot
-exhibit acquisition disparity at all, since they do not consult the
-patient.
+policies is not currently feasible: the 366-participant audit cohort
+contains 9 Black, 9 Hispanic and 4 Asian participants, with no converters in
+any of these groups, so neither acquisition rates nor error rates can be
+estimated with any precision. This is a limitation of the data, not a
+finding about the policies: reduced representation shows that these groups
+cannot be audited, not that the policies treat them unfairly. On sex, the only
+adequately powered dimension (213 male and 153 female participants), no
+acquisition disparity survived multiplicity correction. Two gaps reached
+$p=0.050$ uncorrected -- the evidential method ordering FDG-PET 10.0
+percentage points less often for male participants, and the RL policy (cost
+weight 0.05) ordering 0.23 more modalities per male participant -- but
+neither survived Benjamini-Hochberg across the comparison family, and they are
+reported as suggestive only (Figure 11). We note that fixed policies cannot
+exhibit acquisition disparity at all, since they do not consult the patient.
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig_sex_acquisition.png}
+\par\vspace{5pt}
+\textbf{Figure 11.} Acquisition rate by modality and sex for the three
+published policies at 24 months (RL policy at cost weight 0.05; male $n=213$,
+female $n=153$). No gap survived Benjamini-Hochberg correction.
+\vspace{10pt}
+\end{figure}
 
 \subsection{Horizon dependence}
 A secondary analysis asked whether modality value depends on the prediction
-horizon, which would motivate horizon-conditioned policies. On a fixed
-subject set, only amyloid-PET showed a significant increase in incremental
-value from 12 to 36 months (+0.054, 95\% CI +0.014 to +0.095); MRI, FDG and
-CSF did not. A horizon-conditioned policy built on this effect did not
+horizon, which would motivate horizon-conditioned policies. This analysis
+uses the same 12-measure MRI block as the main benchmark. On a fixed subject
+set, amyloid-PET and CSF showed a significant increase in incremental value
+from 12 to 36 months (+0.049, 95\% CI +0.021 to +0.080, and +0.040, 95\% CI
++0.010 to +0.068); MRI and FDG did not (tau-PET, flagged underpowered, also
+increased). A horizon-conditioned policy built on this effect did not
 outperform horizon-swapped controls, indicating the effect is real as a
 measurement but not exploitable as an acquisition rule at this sample size.
+Figure 12 shows the incremental value of each modality by horizon (a) and on
+subjects matched to each modality, including all four together (b).
+
+
+\begin{figure}[!tbp]
+\centering
+\includegraphics[width=\textwidth]{fig11_horizon.png}
+\par\vspace{3pt}
+\textbf{Figure 12.} (a) Incremental AUC of each modality over the cheap-only model at 12, 24 and 36 months on a fixed subject set (95\% CI); tau-PET omitted as underpowered. (b) The same quantity on subjects matched to each modality; the
+all-four estimate rises from +0.047 at 12 months to +0.121 at 36 months. Both
+panels use the 12-measure MRI block.
+\end{figure}
+
 
 \subsection{Limitations}
 The three policies are re-implementations from published descriptions, as
@@ -456,7 +955,19 @@ re-implementation is weaker evidence than one about original code, and we
 state this plainly. Sample sizes are modest -- 67 converters in the
 24-month development cohort and 17 in its test set -- so several
 non-significant comparisons are underpowered, and ``not distinguishable''
-should not be read as ``equivalent''. Acquisition costs are relative units
+should not be read as ``equivalent''. Random acquisition is matched to each policy
+by expected cost, not as a strict fixed budget: the matched rate is derived
+from the policy's mean cost, and a policy's per-patient cost can differ from
+random acquisition's even when the means agree (Section 3.6). Comparisons
+against cost-matched random are Holm-adjusted within each horizon and cost
+regime (families of 13), but not across horizons and regimes together, and
+comparisons against acquire-all are unadjusted. In the
+proposed configuration, different acquisition states are fitted on different,
+overlapping subject sets, so part of the gain may reflect which subjects
+each state was trained on, and one FreeSurfer table treats a month-3 scan as
+baseline-equivalent. The held-out test set was scored on two ADNI data
+releases (Section 3.2) with unchanged code, so it cannot be treated as
+untouched with respect to the first. Acquisition costs are relative units
 whose absolute values are contestable, which is why every cost-dependent
 conclusion is reported across three regimes. ADNI's missingness is
 protocol-driven rather than random, so any retrospective estimate of what
@@ -468,25 +979,30 @@ come from a single cohort without external validation.
 Three published adaptive modality-acquisition policies for Alzheimer's
 disease prognosis were re-implemented and audited under a common
 leakage-free protocol across three prediction horizons and three cost
-regimes. None significantly outperformed random acquisition at any horizon,
-18 of 33 policy-horizon pairs were dominated by a patient-independent fixed
-rule costing no more, and the finding survived a predictor swap, a seed
-sweep and decision-curve analysis. The cost savings these methods report
-are real, but they do not appear to derive from personalisation: a rule
-that ignores the patient entirely captures them as well.
+regimes. Against random acquisition at the same expected cost, 25 of 27
+configuration-horizon pairs showed no significant difference after Holm
+correction under price-like costs (one better, one worse), and 19 of 27 were dominated by a
+patient-independent fixed rule costing no more under price-like costs (12
+under every cost regime tested). For most configurations, then, the cost
+savings these methods report do not appear to derive from personalisation: a
+rule that ignores the patient captures them as well, and so does spending the
+same budget at random. The one significant gain, the RL policy at cost weight
+0.05 at 12 months, did not recur at 24 or 36 months.
 
-Consistent with this, a configuration built from two established techniques
--- AD-signature structural features and training on partially observed
-participants -- reached accuracy statistically indistinguishable from
-acquiring four modalities at one-third to one-ninth of the acquisition
-cost, with the caveat that its cheapest operating point weakens at the
-36-month horizon.
+Consistent with this, SPFA, built from two existing ideas -- an expanded set
+of structural MRI features and training on partially observed participants --
+beat cost-matched random acquisition at its MRI-only operating point at 24 and
+36 months, and showed no significant AUC difference from acquiring four
+modalities at about one-third to one-tenth of the acquisition cost, with the
+caveats that its cheapest operating point was significantly lower at the
+36-month horizon in development and that the small test set cannot establish
+equivalence.
 
 Finally, complete-case multimodal analysis reduces non-White representation
-in this cohort from 17.1\% to 5.9\%, and recent recruitment gains are not
+in this cohort from 14.2\% to 5.9\%, and recent recruitment gains are not
 yet visible to conversion studies because those participants lack
 follow-up. Race-stratified fairness auditing of acquisition policies on
-ADNI is therefore not currently feasible, a constraint the field should
+the current complete-case ADNI cohort is therefore not feasible, a constraint the field should
 state explicitly rather than rediscover per study.
 
 Future work should test these policies on prospective or more diverse
@@ -507,40 +1023,72 @@ identifiable participant information was accessed. Data were used in
 accordance with the ADNI Data Use Agreement.
 
 \section*{\fontsize{12}{12}\selectfont\textbf{Conflicts of Interest}}
-The author declares no conflicts of interest.
+The authors declare no conflicts of interest.
 
 \section*{\fontsize{12}{12}\selectfont\textbf{Acknowledgement}}
-Data used in preparation of this article were obtained from the Alzheimer's
-Disease Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu). As
-such, the investigators within the ADNI contributed to the design and
-implementation of ADNI and/or provided data but did not participate in
-analysis or writing of this report. A complete listing of ADNI
-investigators can be found at:
-http://adni.loni.usc.edu/wp-content/uploads/how\_to\_apply/ADNI\_Acknowledgement\_List.pdf
+{\small Data collection and sharing for this project was funded by the Alzheimer's
+Disease Neuroimaging Initiative (ADNI) (National Institutes of Health Grant
+U01 AG024904) and DOD ADNI (Department of Defense award number
+W81XWH-12-2-0012). ADNI is funded by the National Institute on Aging, the
+National Institute of Biomedical Imaging and Bioengineering, and through
+generous contributions from the following: AbbVie, Alzheimer's Association;
+Alzheimer's Drug Discovery Foundation; Araclon Biotech; BioClinica, Inc.;
+Biogen; Bristol-Myers Squibb Company; CereSpir, Inc.; Cogstate; Eisai Inc.;
+Elan Pharmaceuticals, Inc.; Eli Lilly and Company; EuroImmun; F.
+Hoffmann-La Roche Ltd and its affiliated company Genentech, Inc.; Fujirebio;
+GE Healthcare; IXICO Ltd.; Janssen Alzheimer Immunotherapy Research \&
+Development, LLC.; Johnson \& Johnson Pharmaceutical Research \& Development
+LLC.; Lumosity; Lundbeck; Merck \& Co., Inc.; Meso Scale Diagnostics, LLC.;
+NeuroRx Research; Neurotrack Technologies; Novartis Pharmaceuticals
+Corporation; Pfizer Inc.; Piramal Imaging; Servier; Takeda Pharmaceutical
+Company; and Transition Therapeutics. The Canadian Institutes of Health
+Research is providing funds to support ADNI clinical sites in Canada. Private
+sector contributions are facilitated by the Foundation for the National
+Institutes of Health (www.fnih.org). The grantee organization is the
+Northern California Institute for Research and Education, and the study is
+coordinated by the Alzheimer's Therapeutic Research Institute at the
+University of Southern California. ADNI data are disseminated by the
+Laboratory for Neuro Imaging at the University of Southern California.\par}
 
 \section*{\fontsize{12}{12}\selectfont\textbf{References}}
+\begingroup\footnotesize\setstretch{1.0}\raggedright
 \begin{enumerate}[{[1]}]
-\item Zheng, Z., Su, Y., Chen, K., Weidman, D., Wu, T., Lo, S. C., Lure, F., \& Li, J., for the Alzheimer's Disease Neuroimaging Initiative. (2023). Uncertainty-driven modality selection for data-efficient prediction of Alzheimer's disease. \textit{IISE Transactions on Healthcare Systems Engineering, 14}(1), 18--31. https://doi.org/10.1080/24725579.2023.2227197
-\item Doan, L., Chen, B., Litton, E., Huang, H., Huang, J., Xie, Y., Zhou, W., Narayanan, N., \& Zhao, C. (2026). ProMUSE: Progressive multi-modal uncertainty-guided staged evidential Alzheimer disease classification. \textit{arXiv preprint} arXiv:2606.19371.
-\item Drissi, N., Khalil, N., El-Kassabi, H., Serhani, M. A., \& Dssouli, R. (2026). Efficient Alzheimer's diagnosis through sequential decision-making with reinforcement learning. In \textit{Proceedings of the 2025 7th International Conference on Big-Data Service and Intelligent Computation} (pp. 108--116). https://doi.org/10.1145/3778265.3778280
-\item Aronsson, L., Rahbar, A., \& Chehreghani, M. H. (2025). A survey on active feature acquisition strategies. \textit{arXiv preprint} arXiv:2502.11067.
-\item Sch\"{u}tz, V., Wu, H., Rezvan, R., Aronsson, L., \& Chehreghani, M. H. (2025). AFABench: A generic framework for benchmarking active feature acquisition. \textit{arXiv preprint} arXiv:2508.14734.
-\item von Kleist, H., Zamanian, A., Shpitser, I., \& Ahmidi, N. (2023). Evaluation of active feature acquisition methods for static feature settings. \textit{arXiv preprint} arXiv:2312.03619.
-\item Rajabinasab, M., Houle, M. E., Chelly, O., \& Zimek, A. (2026). Worse than random: The importance of a baseline for unsupervised feature selection. \textit{arXiv preprint} arXiv:2605.22973.
-\item Perets, B., Mendelson, N., Vainberg, S., Chowers, Y., Shen-Orr, S., \& Mannor, S. (2026). Zero-shot active feature acquisition via LLM-elicitation. \textit{arXiv preprint} arXiv:2606.18933.
-\item Marinescu, R. V., Oxtoby, N. P., Young, A. L., Bron, E. E., Toga, A. W., Weiner, M. W., Barkhof, F., Fox, N. C., Golland, P., Klein, S., \& Alexander, D. C. (2020). TADPOLE Challenge: Accurate Alzheimer's disease prediction through crowdsourced forecasting of future data. \textit{arXiv preprint} arXiv:2001.09016.
-\item Dickerson, B. C., \& Wolk, D. A. (2013). Biomarker-based prediction of progression in MCI: Comparison of AD signature and hippocampal volume with spinal fluid amyloid-beta and tau. \textit{Frontiers in Aging Neuroscience, 5}, 55. https://doi.org/10.3389/fnagi.2013.00055
-\item Thung, K.-H., Yap, P.-T., \& Shen, D. (2017). Multi-stage diagnosis of Alzheimer's disease with incomplete multimodal data via multi-task deep learning. In \textit{Deep Learning in Medical Image Analysis and Multimodal Learning for Clinical Decision Support} (pp. 160--168). Springer. https://doi.org/10.1007/978-3-319-67558-9\_19
-\item Young, V. M., Gates, S., Garcia, L. Y., \& Salardini, A. (2025). Data leakage in deep learning for Alzheimer's disease diagnosis: A scoping review of methodological rigor and performance inflation. \textit{Diagnostics, 15}(18), 2348. https://doi.org/10.3390/diagnostics15182348
-\item Wen, J., Thibeau-Sutre, E., Diaz-Melo, M., Samper-Gonzalez, J., Routier, A., Bottani, S., Dormont, D., Durrleman, S., Burgos, N., \& Colliot, O. (2020). Convolutional neural networks for classification of Alzheimer's disease: Overview and reproducible evaluation. \textit{Medical Image Analysis, 63}, 101694. https://doi.org/10.1016/j.media.2020.101694
-\item Yuan, C., Linn, K. A., \& Hubbard, R. A. (2023). Algorithmic fairness of machine learning models for Alzheimer disease progression. \textit{JAMA Network Open, 6}(11), e2342203. https://doi.org/10.1001/jamanetworkopen.2023.42203
-\item Benjamini, Y., \& Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. \textit{Journal of the Royal Statistical Society: Series B, 57}(1), 289--300.
-\item Vickers, A. J., \& Elkin, E. B. (2006). Decision curve analysis: A novel method for evaluating prediction models. \textit{Medical Decision Making, 26}(6), 565--574.
-\item Sensoy, M., Kaplan, L., \& Kandemir, M. (2018). Evidential deep learning to quantify classification uncertainty. In \textit{Advances in Neural Information Processing Systems, 31}.
+\item Zheng, Z., Y. Su, K. Chen, D. Weidman, T. Wu, S. C. Lo, F. Lure, and J. Li, for the Alzheimer's Disease Neuroimaging Initiative. ``Uncertainty-Driven Modality Selection for Data-Efficient Prediction of Alzheimer's Disease.'' \textit{IISE Transactions on Healthcare Systems Engineering} 14, no. 1 (2024): 18--31. https://doi.org/10.1080/24725579.2023.2227197.
+\item Doan, L., B. Chen, E. Litton, H. Huang, J. Huang, Y. Xie, W. Zhou, N. Narayanan, and C. Zhao. ``ProMUSE: Progressive Multi-Modal Uncertainty-Guided Staged Evidential Alzheimer Disease Classification.'' Preprint, arXiv:2606.19371, 2026.
+\item Drissi, N., N. Khalil, H. El-Kassabi, M. A. Serhani, and R. Dssouli. ``Efficient Alzheimer's Diagnosis through Sequential Decision-Making with Reinforcement Learning.'' In \textit{Proceedings of the 2025 7th International Conference on Big-Data Service and Intelligent Computation}, 108--16. ACM, 2025. https://doi.org/10.1145/3778265.3778280.
+\item Aronsson, L., A. Rahbar, and M. H. Chehreghani. ``A Survey on Active Feature Acquisition Strategies.'' In \textit{Proceedings of the International Joint Conference on Artificial Intelligence, Survey Track}, 7740--48. IJCAI, 2026. https://doi.org/10.24963/ijcai.2026/860.
+\item Sch\"{u}tz, V., H. Wu, R. Rezvan, L. Aronsson, and M. H. Chehreghani. ``AFABench: A Generic Framework for Benchmarking Active Feature Acquisition.'' In \textit{Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining}, 9765--76. ACM, 2026. https://doi.org/10.1145/3770855.3817493.
+\item von Kleist, H., A. Zamanian, I. Shpitser, and N. Ahmidi. ``Evaluation of Active Feature Acquisition Methods for Static Feature Settings.'' Preprint, arXiv:2312.03619, 2023.
+\item Rajabinasab, M., M. E. Houle, O. Chelly, and A. Zimek. ``Worse than Random: The Importance of a Baseline for Unsupervised Feature Selection.'' Preprint, arXiv:2605.22973, 2026.
+\item Perets, B., N. Mendelson, S. Vainberg, Y. Chowers, S. Shen-Orr, and S. Mannor. ``Zero-Shot Active Feature Acquisition via LLM-Elicitation.'' Preprint, arXiv:2606.18933, 2026.
+\item Marinescu, R. V., N. P. Oxtoby, A. L. Young, E. E. Bron, A. W. Toga, M. W. Weiner, F. Barkhof, et al. ``TADPOLE Challenge: Accurate Alzheimer's Disease Prediction through Crowdsourced Forecasting of Future Data.'' In \textit{Multimodal Brain Image Analysis Workshop (MICCAI 2019)}. Springer, 2019. https://doi.org/10.1007/978-3-030-32281-6\_1. Preprint, arXiv:2001.09016.
+\item Dickerson, B. C., and D. A. Wolk, for the Alzheimer's Disease Neuroimaging Initiative. ``Biomarker-Based Prediction of Progression in MCI: Comparison of AD Signature and Hippocampal Volume with Spinal Fluid Amyloid-Beta and Tau.'' \textit{Frontiers in Aging Neuroscience} 5 (2013): 55. https://doi.org/10.3389/fnagi.2013.00055.
+\item Thung, K.-H., P.-T. Yap, and D. Shen. ``Multi-Stage Diagnosis of Alzheimer's Disease with Incomplete Multimodal Data via Multi-Task Deep Learning.'' In \textit{Deep Learning in Medical Image Analysis and Multimodal Learning for Clinical Decision Support}, 160--68. Springer, 2017. https://doi.org/10.1007/978-3-319-67558-9\_19.
+\item Young, V. M., S. Gates, L. Y. Garcia, and A. Salardini. ``Data Leakage in Deep Learning for Alzheimer's Disease Diagnosis: A Scoping Review of Methodological Rigor and Performance Inflation.'' \textit{Diagnostics} 15, no. 18 (2025): 2348. https://doi.org/10.3390/diagnostics15182348.
+\item Wen, J., E. Thibeau-Sutre, M. Diaz-Melo, J. Samper-Gonzalez, A. Routier, S. Bottani, D. Dormont, S. Durrleman, N. Burgos, and O. Colliot. ``Convolutional Neural Networks for Classification of Alzheimer's Disease: Overview and Reproducible Evaluation.'' \textit{Medical Image Analysis} 63 (2020): 101694. https://doi.org/10.1016/j.media.2020.101694.
+\item Yuan, C., K. A. Linn, and R. A. Hubbard. ``Algorithmic Fairness of Machine Learning Models for Alzheimer Disease Progression.'' \textit{JAMA Network Open} 6, no. 11 (2023): e2342203. https://doi.org/10.1001/jamanetworkopen.2023.42203.
+\item Sensoy, M., L. Kaplan, and M. Kandemir. ``Evidential Deep Learning to Quantify Classification Uncertainty.'' In \textit{Advances in Neural Information Processing Systems}, vol. 31. 2018.
+\item Benjamini, Y., and Y. Hochberg. ``Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.'' \textit{Journal of the Royal Statistical Society: Series B} 57, no. 1 (1995): 289--300. https://doi.org/10.1111/j.2517-6161.1995.tb02031.x.
+\item Vickers, A. J., and E. B. Elkin. ``Decision Curve Analysis: A Novel Method for Evaluating Prediction Models.'' \textit{Medical Decision Making} 26, no. 6 (2006): 565--74. https://doi.org/10.1177/0272989X06295361.
 \end{enumerate}
+\endgroup
 
-\section*{\fontsize{12}{12}\selectfont\textbf{Author's biography}}
-\textbf{Rishi Jayanath} [Author biography of up to 200 words, with photograph, to be supplied.]
+\section*{\fontsize{12}{12}\selectfont\textbf{Authors' Biographies}}
+\begingroup\footnotesize\setstretch{1.0}
+\setlength{\parskip}{3pt}
+\newcommand{\authorbio}[3]{%
+\noindent\begin{minipage}[t]{1.7cm}\vspace{0pt}\includegraphics[width=1.7cm]{authors/#1.jpg}\end{minipage}\hfill
+\begin{minipage}[t]{\dimexpr\textwidth-2.0cm\relax}\vspace{0pt}\textbf{#2} #3\end{minipage}\par\vspace{2pt}}
 
-\end{onehalfspace}
+\authorbio{rishi}{Rishi Jayanath A}{is a final-year undergraduate student pursuing a Bachelor of Technology in Computer Science and Engineering at Karunya Institute of Technology and Sciences, India. His academic and research interests include Artificial Intelligence, Machine Learning, Deep Learning, Computer Vision, and GPU-accelerated computing. His research focuses on intelligent and explainable deep learning frameworks for real-world classification problems, including microscopic fungal species classification on the DeFungi dataset using multi-scale Vision Transformers, confidence-guided model fusion, comparative evaluation of Vision Transformer, Swin Transformer, ResNet and EfficientNet architectures, and attention-based interpretability. His broader interests include medical image analysis and intelligent computing systems, and he is particularly interested in reproducible, computationally efficient and scientifically rigorous research that combines predictive performance with explainability. He aspires to pursue further research in emerging computing technologies and intelligent systems. Email: rishijayanath@karunya.edu.in.}
+
+\authorbio{adwaith}{Adwaith Sajikumar}{is a Computer Science and Engineering student at Karunya Institute of Technology and Sciences, passionate about Artificial Intelligence, AI agents, intelligent automation and emerging technologies. His interests include AI agent development, large language models, machine learning, retrieval-augmented generation, AI-powered applications and software engineering. Through his experience at Entarch Solutions and his involvement in research, collaborative development and hackathons, he has gained exposure to software development, system design and testing. His research interests also extend to intelligent computing architectures and the practical application of AI in real-world environments. He contributes to the IEEE Computer Society as a Development Lead, engaging in technical initiatives and collaborative learning. His goal is to deepen his expertise in AI engineering, develop reliable AI-powered products, and pursue postgraduate studies in the United States. Email: adwaithsajikumar@karunya.edu.in.}
+
+\authorbio{naveen}{Dr. G. Naveen Sundar}{is an Associate Professor in the Division of Computer Science and Engineering at Karunya Institute of Technology and Sciences. He holds a Ph.D. in Computer Science and Engineering from Anna University, an M.E. from Karunya University, and a B.E. from Manonmaniam Sundaranar University, and has been associated with Karunya since 2006. His research interests include Computer Vision, Data Science, Medical Image Processing, Machine Learning and Deep Learning. He has published 35 international journal papers and 29 national and international conference papers, with 67 Scopus citations and 102 Google Scholar citations (h-index 6). He has guided 13 postgraduate research scholars and currently supervises seven Ph.D. scholars. His contributions include participation in the HALECOM project funded by Boston Children's Hospital, Harvard Medical School, USA, a published Indian patent application on Target Protein Prediction for Infectious Diseases, and the book \textit{Problem Solving using Python} (Charulatha Publisher, 2024). Email: naveensundar@karunya.edu.}
+
+\authorbio{narmadha}{Dr. D. Narmadha}{is an Associate Professor in the Division of Artificial Intelligence and Machine Learning at Karunya Institute of Technology and Sciences. She holds a Ph.D. in Computer Science and Engineering from Sathyabama Institute of Science and Technology (2021), an M.Tech. from Karunya Institute of Technology and Sciences (2011), and a B.E. from Francis Xavier Engineering College (2006). Her research interests include Machine Learning, Deep Learning and Computer Vision, and she teaches Machine Learning, Database Management Systems, Soft Computing, Data Visualization and Data Science. She has contributed 21 international journal publications and 28 national and international conference publications, with 71 Scopus citations and 99 Google Scholar citations (h-index 5), and is a patent contributor for \textit{Target Protein Prediction for Infectious Diseases} (December 2021). She has guided three postgraduate and 18 undergraduate scholars and continues to supervise doctoral and undergraduate research scholars. Email: narmadha@karunya.edu.}
+\endgroup
+
+\end{spacing}
 \end{document}
+

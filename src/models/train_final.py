@@ -185,7 +185,7 @@ def main() -> None:
                 "git_commit": _git_commit(),
                 "random_state": RANDOM_STATE,
                 "C_grid": C_GRID,
-                "test_set_touched": False,
+                "test_set_touched": Path("models/TEST_SET_SPENT.json").exists(),  # training never reads the test set; this records whether it has since been scored
                 "models": all_records,
             },
             f,

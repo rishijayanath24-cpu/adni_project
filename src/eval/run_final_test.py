@@ -65,7 +65,7 @@ def main() -> None:
     if RECEIPT.exists():
         print(f"WARNING: {RECEIPT} already exists. The test set has been spent before:")
         print(RECEIPT.read_text(encoding="utf-8"))
-        print("\nRunning again does not restore its validity. Report the FIRST result.")
+        print("\nRunning again does not restore its validity. Report every scoring and state it.")
 
     label_col = f"LABEL_{args.horizon}mo"
     cohort = build_cohort(build_subject_visits())
@@ -135,12 +135,19 @@ def main() -> None:
         print(pd.DataFrame(comp).to_string(index=False))
 
     res.to_csv(f"paper/tables/FINAL_TEST_{args.horizon}mo.csv", index=False)
-    RECEIPT.write_text(json.dumps({
-        "spent_utc": datetime.now(timezone.utc).isoformat(),
+    # Append, never overwrite: every scoring of the test set stays on the record.
+    runs = []
+    if RECEIPT.exists():
+        prev = json.loads(RECEIPT.read_text(encoding="utf-8"))
+        runs = prev["runs"] if isinstance(prev, dict) and "runs" in prev else [prev]
+    runs.append({
+        "scored_utc": datetime.now(timezone.utc).isoformat(),
         "horizon": args.horizon,
         "n_test": len(test),
         "n_converters": int(y.sum()),
-    }, indent=2), encoding="utf-8")
+        "data_release": ", ".join(sorted(f.name for f in Path("data/raw").glob("DATADIC_*.csv"))) or "unknown",
+    })
+    RECEIPT.write_text(json.dumps({"runs": runs}, indent=2), encoding="utf-8")
     print(f"\nWrote paper/tables/FINAL_TEST_{args.horizon}mo.csv and {RECEIPT}")
 
 
