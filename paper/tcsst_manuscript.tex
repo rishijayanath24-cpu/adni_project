@@ -80,30 +80,7 @@ http://adni.loni.usc.edu/wp-content/uploads/how\_to\_apply/ADNI\_Acknowledgement
 \begin{spacing}{1.0}
 
 \section*{Abstract}
-Adaptive modality-acquisition policies promise to cut the cost of
-Alzheimer's disease prognosis by deciding, per patient, which scan to order,
-but to our knowledge none has been compared with the others or with the
-trivial baselines that any cost-saving claim must beat. We re-implemented
-three published policies (an uncertainty-gated cascade, a staged evidential
-method and a reinforcement-learning test-ordering policy) as nine
-configurations under one leakage-free protocol, using 1,566 participants with
-mild cognitive impairment from the Alzheimer's Disease Neuroimaging
-Initiative (ADNI) and conversion outcomes at 12, 24 and 36 months. Against
-random acquisition at the same expected cost, 25 of 27 configuration-horizon
-pairs showed no significant difference after Holm correction under price-like
-costs (one better, one worse), and 19 of 27 were dominated by a
-patient-independent fixed rule costing no more. A fixed rule using expanded
-structural magnetic resonance imaging (MRI) features and training on
-partially observed participants (signature-pooled fixed acquisition, SPFA)
-beat cost-matched random acquisition at its MRI-only operating point (area
-under the receiver operating characteristic curve, AUC, +0.056 and +0.046 at 24 and 36 months; Holm-adjusted
-$p=0.010$ and $0.016$) and showed no significant AUC difference from
-acquiring all four modalities at one-third to one-tenth of the cost, except
-for MRI-only at 36 months in development. The held-out test set, scored on
-two successive data releases (the second is reported), is small and cannot
-establish equivalence. Complete-case analysis reduced non-White
-representation from 14.2\% to 5.9\%, making race-stratified fairness
-auditing infeasible.
+Adaptive modality-acquisition policies promise to cut the cost of Alzheimer's disease prognosis by deciding, per patient, which scan to order, but to our knowledge none has been compared with the others or with the trivial baselines that any cost-saving claim must beat. We re-implemented three published policies (uncertainty-gated, staged evidential and reinforcement-learning) from their descriptions under one leakage-free protocol, using 1,566 participants with mild cognitive impairment from the Alzheimer's Disease Neuroimaging Initiative (ADNI) and conversion outcomes at 12, 24 and 36 months; they are not exact reproductions. Against random acquisition at the same expected cost, 25 of 27 configuration-horizon pairs showed no significant difference after Holm correction under price-like costs (one better, one worse), and 19 of 27 were dominated by a patient-independent fixed rule costing no more. Signature-pooled fixed acquisition (SPFA) is not a new decision rule: it gives every patient the same tests, using expanded structural magnetic resonance imaging (MRI) features and training on partially observed participants. At its MRI-only operating point it beat cost-matched random acquisition (area under the receiver operating characteristic curve, AUC, +0.056 and +0.046 at 24 and 36 months; Holm-adjusted $p=0.010$ and $0.016$) and showed no significant AUC difference from acquiring all four modalities at about 11\% to 32\% of the price-like acquisition cost, except for MRI-only at 36 months in development. The small held-out test set, scored on two data releases (the second is reported), cannot establish equivalence. Complete-case analysis reduced non-White representation from 14.2\% to 5.9\%, making race-stratified fairness auditing infeasible.
 
 \vspace{5pt}
 \textbf{\fontsize{12}{12}\selectfont Keywords:} Alzheimer's disease,
@@ -156,8 +133,10 @@ and its consequence for fairness auditing.
 \end{enumerate}
 
 We report a largely negative result, and one constructive consequence of
-it. We are explicit throughout about which findings are new and which
-reproduce established results in a new setting.
+it: SPFA, a fixed rule built from two existing ideas, is offered as a
+baseline for the benchmark, not as a new acquisition algorithm. We are
+explicit throughout about which findings are new and which reproduce
+established results in a new setting.
 
 \section{Related Work}
 
@@ -684,8 +663,9 @@ obtainable directly. Table 4 gives the nested cross-validated AUC of SPFA,
 which combines the expanded MRI block [10] with training each acquisition
 state on every participant who holds it rather than on complete cases only
 [11]. Neither ingredient is novel; their use as the baseline against which
-adaptive policies are measured is. Cost ratios refer to acquire-all (9.5
-price-like units): 9.5 for MRI-only and 3.2 for MRI+FDG.
+adaptive policies are measured is. Under price-like costs SPFA costs 1.0 (MRI only) and 3.0 (MRI+FDG) units
+against 9.5 for acquire-all, about 11\% and 32\% of the acquisition cost
+(25\% and 50\% under flat costs; 7\% and 29\% under burden costs).
 
 \begin{table}[!htbp]
 \centering
@@ -719,7 +699,7 @@ acquire-all; development cross-validation; 95\% bootstrap CI).\\\vspace{5pt}
 \hline
 \textbf{Configuration} & \textbf{12 mo} & \textbf{24 mo} & \textbf{36 mo} \\
 \hline
-MRI-only (cost 1.0) & $-0.002$ ($-0.055$, $+0.059$) & $-0.009$ ($-0.035$, $+0.018$) & $-0.036$ ($-0.068$, $-0.004$) \\\hline
+MRI-only (cost 1.0) & $-0.003$ ($-0.055$, $+0.059$) & $-0.009$ ($-0.035$, $+0.018$) & $-0.036$ ($-0.068$, $-0.004$) \\\hline
 MRI+FDG (cost 3.0) & $+0.011$ ($-0.016$, $+0.037$) & $-0.002$ ($-0.026$, $+0.021$) & $-0.016$ ($-0.040$, $+0.008$) \\\hline
 \end{tabular}
 \end{table}
@@ -894,10 +874,11 @@ Consistent with this, SPFA, built from two existing ideas -- an expanded set
 of structural MRI features and training on partially observed participants --
 beat cost-matched random acquisition at its MRI-only operating point at 24 and
 36 months, and showed no significant AUC difference from acquiring four
-modalities at about one-third to one-tenth of the acquisition cost, with the
+modalities at about 11\% to 32\% of the price-like acquisition cost, with the
 caveats that its cheapest operating point was significantly lower at the
-36-month horizon in development and that the small test set cannot establish
-equivalence.
+36-month horizon in development, that the small test sets (scored on two data
+releases) cannot establish equivalence, and that SPFA is a baseline built from
+existing ideas, not a new acquisition algorithm.
 
 Finally, complete-case multimodal analysis reduces non-White representation
 in this cohort from 14.2\% to 5.9\%, and recent recruitment gains are not
