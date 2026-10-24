@@ -6,6 +6,33 @@
   <img alt="Animated cost-accuracy chart: published acquisition policies vs an MRI-only model at the 24-month horizon" src="assets/hero-dark.svg">
 </picture>
 
+## The four acquisition blocks
+
+Each block is bought whole, at a price-like cost roughly proportional to US list prices. The bars show each block's incremental AUC over the cheap-only model (demographics, cognition, APOE); see Findings §1.
+
+<p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/modality-mri-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/modality-mri-light.svg">
+  <img alt="MRI card, cost 1.0: animated coronal scan with hippocampus and ventricles segmented; AUC gain +0.054, +0.037, +0.039 at 12, 24, 36 months" src="assets/modality-mri-dark.svg" width="49%">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/modality-fdg-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/modality-fdg-light.svg">
+  <img alt="FDG-PET card, cost 2.0: animated tracer uptake with a reduced-uptake pattern; AUC gain +0.022, +0.038, +0.047" src="assets/modality-fdg-dark.svg" width="49%">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/modality-amyloid-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/modality-amyloid-light.svg">
+  <img alt="Amyloid-PET card, cost 5.0: animated plaque build-up and summary SUVR passing a cutoff; AUC gain +0.015, +0.036, +0.068" src="assets/modality-amyloid-dark.svg" width="49%">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/modality-csf-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/modality-csf-light.svg">
+  <img alt="CSF card, cost 1.5: animated lumbar puncture filling a sample tube, with Aβ42, total tau and p-tau; AUC gain +0.014, +0.030, +0.047" src="assets/modality-csf-dark.svg" width="49%">
+</picture>
+</p>
+
 ## Status
 Pipeline, three baseline re-implementations, the policy benchmark, the
 fairness audit, robustness sweeps, clinical-utility analysis and the final
