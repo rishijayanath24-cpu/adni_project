@@ -1,5 +1,11 @@
 # Fairness- and Horizon-Audited Sequential Modality Acquisition for Alzheimer's Risk Stratification on ADNI
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/hero-light.svg">
+  <img alt="Animated cost-accuracy chart: published acquisition policies vs an MRI-only model at the 24-month horizon" src="assets/hero-dark.svg">
+</picture>
+
 ## Status
 Pipeline, three baseline re-implementations, the policy benchmark, the
 fairness audit, robustness sweeps, clinical-utility analysis and the final
