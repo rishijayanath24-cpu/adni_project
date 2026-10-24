@@ -1,6 +1,33 @@
 {
-  "spent_utc": "2026-09-11T20:07:54.800755+00:00",
-  "horizon": 36,
-  "n_test": 84,
-  "n_converters": 22
+  "runs": [
+    {
+      "scored_utc": "2026-09-11T20:07:54.800755+00:00",
+      "horizon": 36,
+      "n_test": 84,
+      "n_converters": 22,
+      "data_release": "DATADIC_01Sep2026.csv",
+      "note": "September-release scoring. The original receipt recorded only the last horizon scored; archived paper/tables_sept2026_release/FINAL_TEST_{12,24,36}mo.csv show all three horizons were scored."
+    },
+    {
+      "scored_utc": "2026-10-21T13:43:20.857256+00:00",
+      "horizon": 12,
+      "n_test": 101,
+      "n_converters": 9,
+      "data_release": "DATADIC_21Oct2026.csv"
+    },
+    {
+      "scored_utc": "2026-10-21T13:43:38.108413+00:00",
+      "horizon": 24,
+      "n_test": 92,
+      "n_converters": 17,
+      "data_release": "DATADIC_21Oct2026.csv"
+    },
+    {
+      "scored_utc": "2026-10-21T13:43:55.485538+00:00",
+      "horizon": 36,
+      "n_test": 84,
+      "n_converters": 22,
+      "data_release": "DATADIC_21Oct2026.csv"
+    }
+  ]
 }

@@ -1,16 +1,16 @@
 state,change,delta_auc,lo,hi,significant
 CHEAP,rich MRI only,0.0,0.0,0.0,False
-CHEAP,pooling only,0.0102,-0.0206,0.0409,False
-CHEAP,both (ours),0.0102,-0.0206,0.0409,False
-CHEAP+MRI,rich MRI only,0.0087,-0.03,0.0477,False
-CHEAP+MRI,pooling only,0.0163,-0.0137,0.0505,False
-CHEAP+MRI,both (ours),0.0323,-0.0097,0.0759,False
-CHEAP+MRI+FDG,rich MRI only,0.0072,-0.0318,0.0451,False
-CHEAP+MRI+FDG,pooling only,0.0204,0.0063,0.0352,True
-CHEAP+MRI+FDG,both (ours),0.0298,-0.0117,0.0735,False
+CHEAP,pooling only,0.0065,-0.0263,0.0381,False
+CHEAP,both (ours),0.0065,-0.0263,0.0381,False
+CHEAP+MRI,rich MRI only,0.0087,-0.03,0.0478,False
+CHEAP+MRI,pooling only,0.0197,-0.0123,0.052,False
+CHEAP+MRI,both (ours),0.0319,-0.0111,0.0757,False
+CHEAP+MRI+FDG,rich MRI only,0.0073,-0.0318,0.0452,False
+CHEAP+MRI+FDG,pooling only,0.0205,0.0063,0.0352,True
+CHEAP+MRI+FDG,both (ours),0.0298,-0.0118,0.0739,False
 CHEAP+MRI+FDG+AMYLOID,rich MRI only,0.0102,-0.0263,0.0459,False
-CHEAP+MRI+FDG+AMYLOID,pooling only,0.0143,-0.0003,0.0307,False
-CHEAP+MRI+FDG+AMYLOID,both (ours),0.0145,-0.0286,0.0598,False
-CHEAP+MRI+FDG+AMYLOID+CSF,rich MRI only,-0.0014,-0.0297,0.0276,False
+CHEAP+MRI+FDG+AMYLOID,pooling only,0.0143,-0.0002,0.0307,False
+CHEAP+MRI+FDG+AMYLOID,both (ours),0.014,-0.0288,0.0591,False
+CHEAP+MRI+FDG+AMYLOID+CSF,rich MRI only,-0.0012,-0.0293,0.0276,False
 CHEAP+MRI+FDG+AMYLOID+CSF,pooling only,0.0,0.0,0.0,False
-CHEAP+MRI+FDG+AMYLOID+CSF,both (ours),-0.0014,-0.0297,0.0276,False
+CHEAP+MRI+FDG+AMYLOID+CSF,both (ours),-0.0012,-0.0293,0.0276,False
